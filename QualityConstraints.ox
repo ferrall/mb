@@ -4,44 +4,42 @@
 
 QualityConstraints::Replicate(){
 
-	decl KW;
+decl KW;
 
-	Initialize(Reachable, TRUE, 0);
-	SetClock(NormalAging,A1);
-	SetDelta(0.97);
+Initialize(Reachable, TRUE, 0);
+SetClock(NormalAging,A1);
+SetDelta(0.97);
 
-	/**Actions**/
+/**Actions**/
 	Actions(
 		work = new ActionVariable("work", MWorklabel), //work
 		attend = new ActionVariable("attend", MAttendlabel), //attend school
 	 	GrowUp = new ActionVariable("GrowUp", MPhaselabel),  
 		savings = new ActionVariable("savings", MaxAssets),  
-		schoice = new ActionVariable("schoice", MSchooltype)); //school choice);
+		schoice = new ActionVariable("schoice", MSchooltype) //school choice
+	);
 
-	savings.actual = <-5000.0, 1000.0, 0, 1000.0, 5000.0>);		 
+	savings.actual = <0.0, 1000.0, 5000.0, 10000.0, 20000.0>;
 
+/**State Variables:**/
 
-	/**State Variables:**/
-
-	//EXOGENOUS STATES: (right now not correlated. Need to add grant shocks - both general and specific). 
+//EXOGENOUS STATES: (right now not correlated. Need to add grant shocks - both general and specific). 
 	ExogenousStates(shocks = new MVNormal("eps", 5, Noffers, zeros(5,1),sig));
 
-	//ENDOGENOUS STATES:
+//ENDOGENOUS STATES:
 #ifdef RandomHumanCapital
 	EndogenousStates(
  		HC = new RandomUpDown("HC", MaxHC, QualityConstraints::HC_trans),				
 		Credits= new RandomUpDown("Credits", MaxCredits, QualityConstraints::Transit),
 		//	BA = new Deterministic("BA", 1, QualityConstraints::Degree_Status),	 //should this be in a state block with credits..right?
 		Sch_loans = new Asset("Sch_loans", MaxScAssets, r1, QualityConstraints::Loans),
-		Sch_loans.actual = <0.0, 1000.0, 5000.0, 20000.0, 50000.0>;
 		asset = new Asset("asset", MaxAssets, r, QualityConstraints::Savings), 
-		asset.actual = <0.0, 1000.0, 5000.0, 20000.0, 50000.0>;
-		GROWNUp = new PermanentChoice("GROWNUp", GrowUp),  //changed from Lagged Action
+		GROWNUp = new LaggedAction("GROWNUp", GrowUp),
 	    OldWorker = new StateCounter("OldWorker", MaxYrsWrk, GROWNUp, 1, 0), //Once it hits 10, workers enter 3rd phase, but need to edit once default is included
 		SchoolType = new PermanentChoice("SchoolType", schoice));
 
-
-	//Sch_loans.actual = <0.0, 1000.0, 5000.0, 20000.0, 50000.0>;
+	asset.actual = <0.0, 1000.0, 5000.0, 20000.0, 50000.0>;
+	Sch_loans.actual = <0.0, 1000.0, 5000.0, 20000.0, 50000.0>;
 		
 #else
 
@@ -54,7 +52,7 @@ QualityConstraints::Replicate(){
 		SchoolType = new PermanentChoice("SchoolType", schoice));
 #endif
 
-	//FIXED EFFECTS
+//FIXED EFFECTS
 	GroupVariables(Abil = new FixedEffect("abil", MAbillabel),
 			   Race = new FixedEffect("race", MRacelabel),
 			   Score = new FixedEffect("score", 1), 	//MScorelabel
@@ -87,8 +85,8 @@ QualityConstraints::FeasibleActions(const Alpha) {
 	decl Borrow_Limit = 0; //calculate state-dependent borrowing limit here. 
 
 	/*Only choice in first period, is which school*/
-	if (Age == Age0) return !any(Alpha[][attend.pos~work.pos~savings.pos~GrowUp.pos]);
-					//!Alpha[][attend.pos] .* !Alpha[][work.pos] .* !Alpha[][savings.pos] .* !Alpha[][GrowUp.pos];
+//	if (Age == Age0) return !any(Alpha[][attend.pos~work.pos~savings.pos~GrowUp.pos]);
+	if (Age == Age0) return !Alpha[][attend.pos] .* !Alpha[][work.pos] .* !Alpha[][savings.pos] .* !Alpha[][GrowUp.pos];
 
 	/*Do not choose school-type after first period*/
 	A = (Alpha[][schoice.pos].==0);
@@ -113,33 +111,31 @@ QualityConstraints::FeasibleActions(const Alpha) {
 
 	/*Need to limit feasible savings*/
 
-/*Cannot use student loans to save in first period, can only borrow*/
-if(GROWNUp.v == 0) A.*= (Alpha[][savings.pos] .<= 2);
+	/*Cannot use student loans to save in first period, can only borrow*/
+	if(GROWNUp.v == 0) A.*= (Alpha[][savings.pos] .<= 2);
 
-/*Old Age: No work choice, all full-time*/
-if(OldWorker.v == 10) A.* (Alpha[][work.pos].==2); //work full-time, can choose savings, that's it (because of GROWNUP==1 conditions above)
+	/*Old Age: No work choice, all full-time*/
+//	if(OldWorker.v == 10) A.* (Alpha[][work.pos].==2); //work full-time, can choose savings, that's it (because of GROWNUP==1 conditions above)
+	
 	/*Need to rule out (Asset) borrowing while in first phase*/
 
 	/*Need to rule out school borrowing while not attending*/
 
-	/*Old Age: No work choice, all full-time*/
-
 	return A;
-	}
+	}  
 	
 /** Total experience cannot exceed age;  Credits cannot exceed Maximum you could have earned **/
 //Need to edit reachable for old age, and credits need to be "forgotten" once get to working age
 //Need to eliminate Credits in after GROWNuP == 1.
 //Need to add constant HC when old
-//Need to rule out (Asset) borrowing while in first phase
 QualityConstraints::Reachable() {
 	//CF: many other unreachable states
-	//if (!GrownUp.v && asset.v!= 0 ) return 0;  no assets before growing up ??
 #ifdef RandomHumanCapital
-		decl MaxEarned = curt, Cr = Credits.v;	
+		decl MaxEarned = curt, Cr = Credits.v;
+		if (!GROWNUp.v && asset.v!= 0 ) return 0; // no assets before growing up ??
 		if (Credits.v > curt) return 0;	 //Need to edit this once more than 1 credit a year
 		if (curt == 0 && asset.v !=0) return 0; //anything other that assets = 0, not possible first period
-		if (Credits.v && GROWNuP.v) return 0
+		if (Credits.v && GROWNUp.v) return 0;
 		return new QualityConstraints();
 #else
 		decl MaxEarned = curt, MaxExp = curt, Cr = Credits.v, yrs_exp = (xper.v)/2;		
@@ -178,7 +174,6 @@ QualityConstraints::Savings(FeasA){
 
 	decl n_savings;
 
-<<<<<<< HEAD
 if(GROWNUp.v == 1){	  //only can have savings if GrownUp
 n_savings = savings.actual[FeasA[][savings.pos]]';
 }
@@ -186,50 +181,7 @@ else{
 n_savings = zeros(rows(FeasA),1);	//no saving when not grownup. 
 }
 return n_savings; 	 
-/*
 
-	if(GROWNUp.v == 1){	  //only can have savings if GrownUp
-
-	decl disu, wage, BA = 0, H_C, Age = Age0 + curt, tuition, transfers, age = curt + Age0, sch_repayment;
-	decl Cr = Credits.v, stype = SchoolType.v, assets = asset.v, epsil = shocks.v, black = Race.v, wealth = Wealth.v, inc = Inc.v,
-	ability = Abil.v, score = Score.v, nsib = Nsib.v;	//getting values 
-	decl att1 = FeasA[][attend.pos], wrk1 = FeasA[][work.pos], sav1 = FeasA[][savings.pos], schloans = Sch_loans.actual[Sch_loans.v];
-
-	decl wage_shock = shocks.Grid[2][epsil[2]];
-
-	decl cons = 0;
-
-	decl r2, a, n, geo_series, sch_repayment1;
-
-	 /*Human capital & Wages & parental transfers*/
-#ifdef RandomHumanCapital
-	H_C = HC.v;
-	 /*Wages*/
-	wage = (wrk1.==0).*(omega_1) + (wrk1.>=1).*(H_C.*exp(alpha_1.*(wrk1.==1) + alpha_2.*att1 + alpha_3.*black + wage_shock));
-#else
-	H_C = exp(phi_0 + phi_1[1].*Cr.*((stype.==1||stype.==3)) + phi_1[0].*Cr.*((stype.==2||stype.==4)) + phi_3.*BA + phi_4.*L + phi_5.*(L^2));
-	/*Wages*/
-	wage = (wrk1.==0).*(omega_1 + omega_2.*L) + (wrk1.>=1).*(HC.*exp(alpha_1.*(wrk.==1) + alpha_2.*att1 + alpha_3.*black + wage_shock));
-#endif
-
-	transfers = chi_0 + chi_1.*att1 + chi_2.*att1.*wealth + chi_3.*(Cr + 12) + chi_4.*age + chi_7.*H_C + chi_8.*black + chi_10.*wrk1;
-
-	/*School Loans repayment - right now no default*/
-	a =	1;
-	r2 = 1/(1+r1);
-	n = MaxYrsWrk - OldWorker.v; //to get number of periods left to repay loan
-	geo_series = (1 - r2^n)/(1-r2);
-	sch_repayment1 = (schloans)/geo_series; //denominator is a geometric series
-
-	n_savings = wage + transfers - sch_repayment1;// - cons; //not sure how to put consumption 'choice' in, need to school loan repayment
-
-	}
-else{
-
-	n_savings = zeros(rows(FeasA),1);	//no saving when not grownup. 
-	}
-return n_savings; 	  //net-savings = income - consumption
-*/
 }
 
 //Net savings for school loans
@@ -262,9 +214,8 @@ decl n_loans;
 
 	/*Parental Transfers*/
 	transfers = chi_0 + chi_1.*att1 + chi_2.*att1.*wealth + chi_3.*(Cr + 12) + chi_4.*age + chi_7.*H_C + chi_8.*black + chi_10.*wrk1;
-
+	
 	if(GROWNUp.v == 0){	
-
 		n_loans = savings.actual[FeasA[][savings.pos]]';
 	}
 	else{
@@ -275,37 +226,10 @@ decl n_loans;
 		geo_series = (1 - r2^n)/(1-r2);
 		sch_repayment = (schloans)/geo_series; //denominator is a geometric series
 
-		n_loans = (assets.actual[assets.v] + wage + transfers .< sch_repayment).*(schloans.*(mu)) + (assets.actual[assets.v] + wage + transfers .> sch_repayment).*(-sch_repayment);	//see if in default or not, choose the correct transition
-}
-/*
-	if(GROWNUp.v == 0){	
-		/*Tuition & Grants*/
-		tuition = tau_0[stype];	//
-		grants_gen = tau_1[0] + tau_1[1].*black + tau_1[2].*inc + tau_1[3].*wealth + tau_1[4].*(score.==1) + tau_1[5].*(score.==2) + tau_1[6].*nsib + gen_grants_shock; //miss 4 year
-		grants_gen = max(grants_gen, 0);  //cannot have negative grants
-
-		grants_spec = tau_2[0] + tau_2[1].*black + tau_2[2].*inc + tau_2[3].*wealth + tau_2[4].*(score.==1) + tau_2[5].*(score.==2) + tau_2[6].*nsib + tau_2[7].*((score.==1)&&(stype.==2)) + tau_2[8].*((score.==2)&&(stype.==2)) + tau_2[9].*(stype.==1) + spec_grants_shock;	//missing grant shock
-		grants_spec = max(grants_spec, 0); //cannot have negative grants
-
-		//no one is getting grants right now with these parameter values
-		net_tuition = (tuition - grants_gen - grants_spec).*att1;
-
-		n_loans = net_tuition - transfers - wage; 	//+ consumption choice...
+		n_loans = (asset.actual[asset.v] + wage + transfers .< sch_repayment).*(schloans.*(mu)) + (asset.actual[asset.v] + wage + transfers .> sch_repayment).*(-sch_repayment);	//see if in default or not, choose the correct transition
 		}
-	else{
-
-	//figuring out yearly payment required to full pay off the school loan by time enters 3rd phase
-		a =	1;
-		r2 = 1/(1+r1);
-		n = MaxYrsWrk - OldWorker.v; //to get number of periods left to repay loan
-		geo_series = (1 - r2^n)/(1-r2);
-		sch_repayment = (schloans)/geo_series; //denominator is a geometric series
-		n_loans = (wage + transfers .< sch_repayment).*(schloans.*(1+mu)) + (wage + transfers .> sch_repayment).*(-sch_repayment);
-		//NOTE: Everyone is defaulting right now, as wages and transfers really low in comparison to required payments
-		}
-*/
-return n_loans; 	    
-}
+	return n_loans; 	    
+	}
 
 //**Transition of Credits**//
 QualityConstraints::Transit(FeasA){
@@ -315,7 +239,6 @@ QualityConstraints::Transit(FeasA){
 	decl prob_fail = 1/(1+exp(pi_f)); 
 	return (prob_fail)~(1-prob_fail)~0; //stay the same, up 1, down 1
 }
-
 /*One Period Return*/
 
 QualityConstraints::Utility() {
@@ -326,7 +249,7 @@ QualityConstraints::Utility() {
 	ability = Abil.v, score = Score.v, nsib = Nsib.v, schloans = Sch_loans.actual[Sch_loans.v];;	//getting values 
 	decl att = aa(attend), wrk = aa(work), stc = aa(schoice), sav = aa(savings);
 
-/*Getting values for i.i.d. shocks (can clean this up later)*/
+	/*Getting values for i.i.d. shocks (can clean this up later)*/
 	decl wrk_shock = shocks.Grid[0][epsil[0]];
 	decl att_shock = shocks.Grid[1][epsil[1]];
  	decl wage_shock = shocks.Grid[2][epsil[2]];
@@ -346,11 +269,12 @@ H_C = HC.v;
 wage = (wrk.==0).*(omega_1) + (wrk.>=1).*(H_C.*exp(alpha_1.*(wrk.==1) + alpha_2.*att + alpha_3.*black + wage_shock));
 #else
 H_C = exp(phi_0 + phi_1[1].*Cr.*((stype.==1||stype.==3)) + phi_1[0].*Cr.*((stype.==2||stype.==4)) + phi_3.*BA + phi_4.*L + phi_5.*(L^2));
+/*Wages*/
 wage = (wrk.==0).*(omega_1 + omega_2.*L) + (wrk.>=1).*(HC.*exp(alpha_1.*(wrk.==1) + alpha_2.*att + alpha_3.*black + wage_shock));
 #endif
 
 /*Tuition & Grants*/
-tuition = tau_0[stype];
+tuition = tau_0[stype];	//
 grants_gen = tau_1[0] + tau_1[1].*black + tau_1[2].*inc + tau_1[3].*wealth + tau_1[4].*(score.==1) + tau_1[5].*(score.==2) + tau_1[6].*nsib + gen_grants_shock; //miss 4 year
 grants_gen = max(grants_gen, 0);  //cannot have negative grants
 
@@ -372,27 +296,34 @@ n = MaxYrsWrk - OldWorker.v; //to get number of periods left to repay loan
 geo_series = (1 - r2^n)/(1-r2);
 sch_repayment1 = (schloans)/geo_series; //denominator is a geometric series
 
-//Not right, need current assets. 
 if(GROWNUp.v == 1){
-sch_repayment2 = (assets.actual[assets.v] + wage + transfers .< sch_repayment1).*(0) + (assets.actual[assets.v] + wage + transfers .>= sch_repayment1).*(-sch_repayment1); 	//only have to repay when grownup
+sch_repayment2 = (wage + transfers .< sch_repayment1).*(0) + (wage + transfers .>= sch_repayment1).*(-sch_repayment1); 	//only have to repay when grownup
 }
 else{
-sch_repayment2 = zeros(rows(aa(attend)),1);  //don't have to repay while school eligible...need to change.
+sch_repayment2 = zeros(rows(aa(attend)),1);  //don't have to repay while in school 
 }
 /*Consumption*/
-cons = wage - net_tuition + grants_gen + grants_spec + transfers - sch_repayment2 - savings.actual[sav]';
-//need to limit consumption to positive amounts!!
+//Do i just need consumption as a choice to do it like this?!
+//consumption is clearly wrong right now.
+cons = wage - net_tuition + grants_gen + grants_spec + transfers - sch_repayment2; // - asset.actual[aa(sav)](GROWNUp.v == 1);
+
+//cons = wages - tuition + grants + transfers - loan repayment - asset.actual[saving_choice]
 cons = (cons.^(1-rho))/(1-rho);
 
+
 /*disutility of work + disutility of school*/
-disu = (att).*(gamma_20 + att_shock) + (wrk.>=1).*(gamma_22 + wrk_shock); // Need to work on this - especially shocks to different schools..
+disu = (att).*(gamma_20 + att_shock) + (wrk.==1).*(gamma_22 + wrk_shock); // Need to work on this - especially shocks to different schools..
 
 /*Total one period utility*/
 util = disu + cons;
 
 return util;
 }
-
+/*
+ERROR:
+1) NOT IN UTILITY
+2) Not in Savings
+ */
 /*Need to add:
 0) Finding errors.
 1)
