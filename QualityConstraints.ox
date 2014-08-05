@@ -55,7 +55,7 @@ EndogenousStates(
 #endif
 
 //FIXED EFFECTS
-GroupVariables(Abil = new FixedEffect("abil", MAbillabel),
+GroupVariables(Abil = new FixedEffect("abil", MAbillabel),	 //Can get rid of this..if it just goes into the initial distribution of HC
 			   Race = new FixedEffect("race", MRacelabel),
 			   Score = new FixedEffect("score", 1), 	//MScorelabel
 			   Wealth = new FixedEffect("wealth", 1),	//MWealthlabel
@@ -112,23 +112,20 @@ if(GROWNUp.v == 1) A.*= (Alpha[][attend.pos].==0);
 
 /*Need to limit feasible savings*/
 
-/*Need to rule out (Asset) borrowing while in first phase*/
-
-/*Need to rule out school borrowing while not attending*/
-
 /*Cannot use student loans to save in first period, can only borrow*/
 if(GROWNUp.v == 0) A.*= (Alpha[][savings.pos] .<= 2);
 
 /*Old Age: No work choice, all full-time*/
+if(OldWorker.v == 10) A.* (Alpha[][work.pos].==2); //work full-time, can choose savings, that's it (because of GROWNUP==1 conditions above)
 
 return A;
 	}
-
 	
 /** Total experience cannot exceed age;  Credits cannot exceed Maximum you could have earned **/
 //Need to edit reachable for old age, and credits need to be "forgotten" once get to working age
 //Need to eliminate Credits in after GROWNuP == 1.
 //Need to add constant HC when old
+//Need to rule out (Asset) borrowing while in first phase
 QualityConstraints::Reachable() {
 
 #ifdef RandomHumanCapital
@@ -160,7 +157,6 @@ QualityConstraints::HC_trans(FeasA) {
 	Experience = beta_1.*(ivals_work==0) + beta_2.*(ivals_work==1) + beta_3.*(ivals_work==2) + beta_0.*Abil.v;
 
 	//Should not accumulate once you are "old age"
-
 	HC_up = (1 - Grownup)*Learning + (Grownup)*Experience;	 //	(OldWorker.v != 10)*((1 - Grownup)*Learning + (Grownup)*Experience) + 	(OldWorker.v != 10)*0;
 	HC_nc = 0;	//(OldWorker.v != 10)*__ + (OldWorker.v == 10)*1
 	HC_down = 1 - HC_up - HC_nc; //(OldWorker.v != 10)*(1 - HC_up - HC_nc) + (OldWorker.v == 10)*0; 
@@ -173,19 +169,6 @@ QualityConstraints::HC_trans(FeasA) {
 QualityConstraints::Savings(FeasA){
 
 decl n_savings;
-
-/*
-Here:
-
-Agents choose net-savings -> i.e. a_(t+1) - (1+r)a_t, or delta_a = r*A + Net Savings
-
-Other choices an agent makes:
-
-1) influence transition through utility associated with these savings decisions (but not 'directly' the transition)
-
-2) transition of school related borrowing is dependent on whether the agent is in default, so must calculate wages, transfers
-*/
-
 
 if(GROWNUp.v == 1){	  //only can have savings if GrownUp
 n_savings = savings.actual[FeasA[][savings.pos]]';
@@ -321,6 +304,7 @@ sch_repayment2 = zeros(rows(aa(attend)),1);  //don't have to repay while school 
 }
 /*Consumption*/
 cons = wage - net_tuition + grants_gen + grants_spec + transfers - sch_repayment2 - savings.actual[sav]';
+//need to limit consumption to positive amounts!!
 cons = (cons.^(1-rho))/(1-rho);
 
 /*disutility of work + disutility of school*/
@@ -334,9 +318,13 @@ return util;
 
 /*Need to add:
 0) Finding errors.
-1) Borrowing limits - function of current states - age and human capital?
+1)
+a) Borrowing limits - function of current states - age and human capital?
+b) make sure consumption has to be positive. 
 2) Actual values for wages - they are way off right now
 3) Degree status - needs to be in a state block with credits?
-4) Years in the second phase - need to add 5 if you end up defaulting
-5) different interest rates for borrowing and saving
+4) Years in the second phase - need to add 5 if you end up defaulting - not sure how to do this?
+5) different interest rates for borrowing and saving?
+6) use functions for the repayment and wages that end up being used over and over again?
+7) Need to fix human capital probabilities
 */
