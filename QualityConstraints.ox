@@ -209,12 +209,16 @@ QualityConstraints::Loans(FeasA){
 
 	/*Parental Transfers*/
 	transfers = chi_0 + chi_1.*att1 + chi_2.*att1.*wealth + chi_3.*(Cr + 12) + chi_4.*age + chi_7.*H_C + chi_8.*black + chi_10.*wrk1;
-	
+
+/*Transition:
+1)	When in School: Just the amount you borrow
+2) If grownup, depends whether you go into default or not: goes up my mu if in default, otherwise normal repayment
+3) If an old worker, it needs to transition to 0. Need to recheck this. 
+*/
 	if(GROWNUp.v == 0){	
 		n_loans = savings.actual[FeasA[][savings.pos]]';
 	}
-	else{
-//figuring out yearly payment required to full pay off the school loan by time enters 3rd phase
+	else if(GROWNUp.v ==1 && OldWorker.v < 10){
 		a =	1;
 		r2 = 1/(1+r1);
 		n = MaxYrsWrk - OldWorker.v; //to get number of periods left to repay loan
@@ -222,6 +226,9 @@ QualityConstraints::Loans(FeasA){
 		sch_repayment = (schloans)/geo_series; //denominator is a geometric series
 
 		n_loans = (asset.actual[asset.v] + wage + transfers .< sch_repayment).*(schloans.*(mu)) + (asset.actual[asset.v] + wage + transfers .> sch_repayment).*(-sch_repayment);	//see if in default or not, choose the correct transition
+		}
+	else{
+		n_loans = -schloans; //so if loans are > 0 when getting old, it goes to zero. 
 		}
 	return n_loans; 	    
 	}
@@ -298,11 +305,11 @@ n = MaxYrsWrk - OldWorker.v; //to get number of periods left to repay loan
 geo_series = (1 - r2^n)/(1-r2);
 sch_repayment1 = (schloans)/geo_series; //denominator is a geometric series
 
-	if(GROWNUp.v == 1 && OldWorker.v < 9){
+	if(GROWNUp.v == 1 && OldWorker.v < 10){
 		sch_repayment2 = (wage + transfers .< sch_repayment1).*(0) + (wage + transfers .>= sch_repayment1).*(-sch_repayment1); 	//only have to repay when grownup
 	}
-	else if(GROWNUp.v == 1 && OldWorker.v == 9){ 
-		sch_repayment2 = -schloans;  //at 9, it goes to zero, then nothing else is reachable...finish this. 
+	else if(GROWNUp.v == 1 && OldWorker.v == 10){ 
+		sch_repayment2 = zeros(rows(aa(attend)),1); //no repayment in old age  
 	}
 	else{
 		sch_repayment2 = zeros(rows(aa(attend)),1);  //don't have to repay while in school 
@@ -321,10 +328,6 @@ util = disu + cons;
 return util;
 }
 /*
--school loans needs to go to 0 after get to old age.
-- needs to go to 0 for transition at 10
--transition needs to be 0 when old
-
 Need to add:
 0) Finding errors.
 1)
@@ -335,8 +338,4 @@ Need to add:
 5) different interest rates for borrowing and saving?
 6) use functions for the repayment and wages that end up being used over and over again?
 7) Need to fix human capital probabilities
-
--Credits transit to a value of 0 when you grow up (they would be 
-correlated with HC which survives and enters the wage equation).
--Mark as unreachable any states that are GrownUP and Credits>0.
 */
