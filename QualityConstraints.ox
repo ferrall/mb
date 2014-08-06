@@ -104,7 +104,7 @@ QualityConstraints::FeasibleActions(const Alpha) {
 	if (Age > MaxAgeAtt) A .*= (Alpha[][GrowUp.pos].==1);
 
 	/*If already GROWNUP, must choose GrowUp every period*/
-	if (GROWNUp.v == 1) A .*= (Alpha[][GrowUp.pos].==1);  //This makes GROWNUp=0 not reachable once GrowUp=1 (right?)
+	if (GROWNUp.v == 1) A .*= (Alpha[][GrowUp.pos].==1); 
 
 	/*rule out school attendance when grownup = 0*/
 	if(GROWNUp.v == 1) A.*= (Alpha[][attend.pos].==0);
@@ -115,27 +115,23 @@ QualityConstraints::FeasibleActions(const Alpha) {
 	if(GROWNUp.v == 0) A.*= (Alpha[][savings.pos] .<= 2);
 
 	/*Old Age: No work choice, all full-time*/
-//	if(OldWorker.v == 10) A.* (Alpha[][work.pos].==2); //work full-time, can choose savings, that's it (because of GROWNUP==1 conditions above)
-	
-	/*Need to rule out (Asset) borrowing while in first phase*/
+	if(OldWorker.v == 10) A.* (Alpha[][work.pos].==2); //work full-time, can choose savings, that's it (because of GROWNUP==1 conditions above)
 
 	/*Need to rule out school borrowing while not attending*/
 
 	return A;
 	}  
-	
-/** Total experience cannot exceed age;  Credits cannot exceed Maximum you could have earned **/
-//Need to edit reachable for old age, and credits need to be "forgotten" once get to working age
-//Need to eliminate Credits in after GROWNuP == 1.
-//Need to add constant HC when old
+	 
 QualityConstraints::Reachable() {
 	//CF: many other unreachable states
 #ifdef RandomHumanCapital
 		decl MaxEarned = curt, Cr = Credits.v;
-		if (!GROWNUp.v && asset.v!= 0 ) return 0; // no assets before growing up ??
-		if (Credits.v > curt) return 0;	 //Need to edit this once more than 1 credit a year
-		if (curt == 0 && asset.v !=0) return 0; //anything other that assets = 0, not possible first period
-		if (Credits.v && GROWNUp.v) return 0;
+		if (!GROWNUp.v && asset.v!= 0 ) return 0; // no assets before growing up
+		if (Credits.v > curt*5) return 0;	 //Need to edit this once more than 1 credit a year
+		if (curt == 0 && asset.v !=0) return 0; //anything other than assets = 0, not possible first period
+		if (Credits.v > 0 && GROWNUp.v == 1) return 0;	//forget credits when grown-up.
+		if (SchoolType.v > 0 && GROWNUp.v ==1) return 0; //forget school type one working age
+		if (OldWorker.v == 10 && Sch_loans.v > 0) return 0; //forget student loans once older worker
 		return new QualityConstraints();
 #else
 		decl MaxEarned = curt, MaxExp = curt, Cr = Credits.v, yrs_exp = (xper.v)/2;		
@@ -174,20 +170,19 @@ QualityConstraints::Savings(FeasA){
 
 	decl n_savings;
 
-if(GROWNUp.v == 1){	  //only can have savings if GrownUp
-n_savings = savings.actual[FeasA[][savings.pos]]';
-}
-else{
-n_savings = zeros(rows(FeasA),1);	//no saving when not grownup. 
-}
+	if(GROWNUp.v == 1){	  //only can have savings if GrownUp
+		n_savings = savings.actual[FeasA[][savings.pos]]';
+		}
+	else{
+		n_savings = zeros(rows(FeasA),1);	//no saving when not grownup. 
+	}
 return n_savings; 	 
-
 }
 
 //Net savings for school loans
 QualityConstraints::Loans(FeasA){
 
-decl n_loans;
+	decl n_loans;
 
 	decl disu, wage, BA = 0, H_C, Age = Age0 + curt, transfers, age = curt + Age0;
 	decl Cr = Credits.v, stype = SchoolType.v, assets = asset.v, epsil = shocks.v, black = Race.v, wealth = Wealth.v, inc = Inc.v,
@@ -233,11 +228,18 @@ decl n_loans;
 
 //**Transition of Credits**//
 QualityConstraints::Transit(FeasA){
-	decl ivals_work = FeasA[][work.pos], ivals_attend = FeasA[][attend.pos];
-	decl ability_1 = Abil.v;
-	decl pi_f = theta_1.*ability_1 + theta_3.*curt + theta_5.*(ivals_work.==0) + (theta_5 + theta_6).*(ivals_work.<=.5) + (theta_5 + theta_6 + theta_7).*(ivals_work.==1); 
-	decl prob_fail = 1/(1+exp(pi_f)); 
-	return (prob_fail)~(1-prob_fail)~0; //stay the same, up 1, down 1
+
+	if(GROWNUp.v == 0){
+		decl ivals_work = FeasA[][work.pos], ivals_attend = FeasA[][attend.pos];
+		decl ability_1 = Abil.v;
+		decl pi_f = theta_1.*ability_1 + theta_3.*curt + theta_5.*(ivals_work.==0) + (theta_5 + theta_6).*(ivals_work.<=.5) + (theta_5 + theta_6 + theta_7).*(ivals_work.==1); 
+		decl prob_fail = 1/(1+exp(pi_f)); 
+		return (prob_fail)~(1-prob_fail)~0; //stay the same, up 1, down 1
+	}
+	else{
+		return 1~0~0; //No transition on credits when grownup. 
+	}
+
 }
 /*One Period Return*/
 
@@ -246,7 +248,7 @@ QualityConstraints::Utility() {
 	decl disu, wage, BA = 0, H_C, util, cons, Age = Age0 + curt, tuition, vasset, grants_gen, grants_spec, transfers, saving_1, asset_1;
 	decl age = curt + Age0,	net_tuition;
 	decl Cr = Credits.v, stype = SchoolType.v, assets = asset.v, epsil = shocks.v, black = Race.v, wealth = Wealth.v, inc = Inc.v, 
-	ability = Abil.v, score = Score.v, nsib = Nsib.v, schloans = Sch_loans.actual[Sch_loans.v];;	//getting values 
+	ability = Abil.v, score = Score.v, nsib = Nsib.v, schloans = Sch_loans.actual[Sch_loans.v];	//getting values 
 	decl att = aa(attend), wrk = aa(work), stc = aa(schoice), sav = aa(savings);
 
 	/*Getting values for i.i.d. shocks (can clean this up later)*/
@@ -264,13 +266,13 @@ QualityConstraints::Utility() {
 
 /*Human capital & Wages*/
 #ifdef RandomHumanCapital
-H_C = HC.v;
+	H_C = HC.v;
  /*Wages*/
-wage = (wrk.==0).*(omega_1) + (wrk.>=1).*(H_C.*exp(alpha_1.*(wrk.==1) + alpha_2.*att + alpha_3.*black + wage_shock));
+	wage = (wrk.==0).*(omega_1) + (wrk.>=1).*(H_C.*exp(alpha_1.*(wrk.==1) + alpha_2.*att + alpha_3.*black + wage_shock));
 #else
-H_C = exp(phi_0 + phi_1[1].*Cr.*((stype.==1||stype.==3)) + phi_1[0].*Cr.*((stype.==2||stype.==4)) + phi_3.*BA + phi_4.*L + phi_5.*(L^2));
+	H_C = exp(phi_0 + phi_1[1].*Cr.*((stype.==1||stype.==3)) + phi_1[0].*Cr.*((stype.==2||stype.==4)) + phi_3.*BA + phi_4.*L + phi_5.*(L^2));
 /*Wages*/
-wage = (wrk.==0).*(omega_1 + omega_2.*L) + (wrk.>=1).*(HC.*exp(alpha_1.*(wrk.==1) + alpha_2.*att + alpha_3.*black + wage_shock));
+	wage = (wrk.==0).*(omega_1 + omega_2.*L) + (wrk.>=1).*(HC.*exp(alpha_1.*(wrk.==1) + alpha_2.*att + alpha_3.*black + wage_shock));
 #endif
 
 /*Tuition & Grants*/
@@ -296,20 +298,19 @@ n = MaxYrsWrk - OldWorker.v; //to get number of periods left to repay loan
 geo_series = (1 - r2^n)/(1-r2);
 sch_repayment1 = (schloans)/geo_series; //denominator is a geometric series
 
-if(GROWNUp.v == 1){
-sch_repayment2 = (wage + transfers .< sch_repayment1).*(0) + (wage + transfers .>= sch_repayment1).*(-sch_repayment1); 	//only have to repay when grownup
-}
-else{
-sch_repayment2 = zeros(rows(aa(attend)),1);  //don't have to repay while in school 
-}
+	if(GROWNUp.v == 1 && OldWorker.v < 9){
+		sch_repayment2 = (wage + transfers .< sch_repayment1).*(0) + (wage + transfers .>= sch_repayment1).*(-sch_repayment1); 	//only have to repay when grownup
+	}
+	else if(GROWNUp.v == 1 && OldWorker.v == 9){ 
+		sch_repayment2 = -schloans;  //at 9, it goes to zero, then nothing else is reachable...finish this. 
+	}
+	else{
+		sch_repayment2 = zeros(rows(aa(attend)),1);  //don't have to repay while in school 
+	}
+	
 /*Consumption*/
-//Do i just need consumption as a choice to do it like this?!
-//consumption is clearly wrong right now.
-cons = wage - net_tuition + grants_gen + grants_spec + transfers - sch_repayment2; // - asset.actual[aa(sav)](GROWNUp.v == 1);
-
-//cons = wages - tuition + grants + transfers - loan repayment - asset.actual[saving_choice]
+cons = wage + transfers - net_tuition - sch_repayment2 - asset.actual[sav];
 cons = (cons.^(1-rho))/(1-rho);
-
 
 /*disutility of work + disutility of school*/
 disu = (att).*(gamma_20 + att_shock) + (wrk.==1).*(gamma_22 + wrk_shock); // Need to work on this - especially shocks to different schools..
@@ -320,19 +321,22 @@ util = disu + cons;
 return util;
 }
 /*
-ERROR:
-1) NOT IN UTILITY
-2) Not in Savings
- */
-/*Need to add:
+-school loans needs to go to 0 after get to old age.
+- needs to go to 0 for transition at 10
+-transition needs to be 0 when old
+
+Need to add:
 0) Finding errors.
 1)
-a) Borrowing limits - function of current states - age and human capital?
-b) make sure consumption has to be positive. 
-2) Actual values for wages - they are way off right now
+	a) Borrowing limits - function of current states - age and human capital?
+	b) make sure consumption has to be positive. 
 3) Degree status - needs to be in a state block with credits?
 4) Years in the second phase - need to add 5 if you end up defaulting - not sure how to do this?
 5) different interest rates for borrowing and saving?
 6) use functions for the repayment and wages that end up being used over and over again?
 7) Need to fix human capital probabilities
+
+-Credits transit to a value of 0 when you grow up (they would be 
+correlated with HC which survives and enters the wage equation).
+-Mark as unreachable any states that are GrownUP and Credits>0.
 */
