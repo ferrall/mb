@@ -118,6 +118,7 @@ QualityConstraints::FeasibleActions(const Alpha) {
 	if(OldWorker.v == 10) A.* (Alpha[][work.pos].==2); //work full-time, can choose savings, that's it (because of GROWNUP==1 conditions above)
 
 	/*Need to rule out school borrowing while not attending*/
+	if(SchoolType.v != 0 && GROWNUp.v == 0) A.*= 1 - (Alpha[][attend.pos] == 0).*(Alpha[][savings.pos] != 0);
 
 	return A;
 	}  
@@ -126,12 +127,23 @@ QualityConstraints::Reachable() {
 	//CF: many other unreachable states
 #ifdef RandomHumanCapital
 		decl MaxEarned = curt, Cr = Credits.v;
-		if (!GROWNUp.v && asset.v!= 0 ) return 0; // no assets before growing up
-		if (Credits.v > curt*5) return 0;	 //Need to edit this once more than 1 credit a year
-		if (curt == 0 && asset.v !=0) return 0; //anything other than assets = 0, not possible first period
+
+		//inital decision
+		if (curt == 0 && GROWNUp.v == 1) return 0; //cant be grown up in initial decision
+		if (curt == 0 && OldWorker.v == 1) return 0; //can't be mature worker in inital decision
+		if (curt == 0 && Sch_loans.v !=0) return 0; //can't start off with student loans
+		
+		//first phase
+		if (Credits.v > curt) return 0;	 //Need to edit this once more than 1 credit a year (covers first phase as well)
+		if (!GROWNUp.v && asset.v!= 0 ) return 0; // no assets before growing up (covers, inital period as well with with first condition)
+		if (!GROWNUp.v && OldWorker.v != 0) return 0; //cannot be young, and also begun counting (not sure if built in).
+
+		//second phase
 		if (Credits.v > 0 && GROWNUp.v == 1) return 0;	//forget credits when grown-up.
-		if (SchoolType.v > 0 && GROWNUp.v ==1) return 0; //forget school type one working age
-		if (OldWorker.v == 10 && Sch_loans.v > 0) return 0; //forget student loans once older worker
+		if (SchoolType.v > 0 && GROWNUp.v ==1) return 0; //forget school type one working age 
+
+		//third phase
+		if (OldWorker.v == 10 && Sch_loans.v > 0) return 0; //forget student loans once older worker, the other two already forgotten.
 		return new QualityConstraints();
 #else
 		decl MaxEarned = curt, MaxExp = curt, Cr = Credits.v, yrs_exp = (xper.v)/2;		
@@ -148,20 +160,25 @@ QualityConstraints::HC_trans(FeasA) {
 	decl ivals_work = FeasA[][work.pos];
 	decl ivals_attend = FeasA[][attend.pos];
 	decl school_quality = SchoolType.v, Grownup = GROWNUp.v;
-	decl Learning, Experience, HC_up, HC_nc, HC_down;
+	decl Learning_up, Learning_nc, Experience_up, Experience_nc, HC_up, HC_nc, HC_down;
 
-	//Learning = probability of going up due to learning: Depends on school/attendance/passing the year, if you're working, ability
-	Learning = beta_4.*(school_quality==1).*(ivals_attend.==1) + beta_5.*(school_quality==2).*(ivals_attend.==1) + beta_6.*(school_quality==3).*(ivals_attend==1) + beta_7.*(school_quality==4).*(ivals_attend==1);
+	if(OldWorker.v < 10){
+		//Experience = probability of going up due to experience: Depends on working (ft vs pt vs not), ability
+		Experience_up = beta_0.*Abil.v + beta_1.*(ivals_work==0) + beta_2.*(ivals_work==1) + beta_3.*(ivals_work==2);
+		Experience_nc = beta_0.*Abil.v + beta_1.*(ivals_work==0) + beta_2.*(ivals_work==1) + beta_3.*(ivals_work==2);
+		//Learning = probability of going up due to learning: Depends on school/attendance/passing the year, if you're working, ability
+		Learning_up = beta_4.*(school_quality==1).*(ivals_attend.==1) + beta_5.*(school_quality==2).*(ivals_attend.==1) + beta_6.*(school_quality==3).*(ivals_attend==1) + beta_7.*(school_quality==4).*(ivals_attend==1);
+		Learning_nc = beta_4.*(school_quality==1).*(ivals_attend.==1) + beta_5.*(school_quality==2).*(ivals_attend.==1) + beta_6.*(school_quality==3).*(ivals_attend==1) + beta_7.*(school_quality==4).*(ivals_attend==1);
 
-	//Experience = probability of going up due to experience: Depends on working (ft vs pt vs not), ability
-	Experience = beta_1.*(ivals_work==0) + beta_2.*(ivals_work==1) + beta_3.*(ivals_work==2) + beta_0.*Abil.v;
-
-	//Should not accumulate once you are "old age"
-	HC_up = (1 - Grownup)*Learning + (Grownup)*Experience;	 //	(OldWorker.v != 10)*((1 - Grownup)*Learning + (Grownup)*Experience) + 	(OldWorker.v != 10)*0;
-	HC_nc = 0;	//(OldWorker.v != 10)*__ + (OldWorker.v == 10)*1
-	HC_down = 1 - HC_up - HC_nc; //(OldWorker.v != 10)*(1 - HC_up - HC_nc) + (OldWorker.v == 10)*0; 
-
-	return HC_up~HC_nc~HC_down;
+		//Should not accumulate once you are "old age"
+		HC_up = (1 - Grownup)*Learning_up + (Grownup)*Experience_up;	 //	(OldWorker.v != 10)*((1 - Grownup)*Learning + (Grownup)*Experience) + 	(OldWorker.v != 10)*0;
+		HC_nc = (1 - Grownup)*Learning_nc + (Grownup)*Experience_nc; //need to update this.
+		HC_down = 1 - HC_up - HC_nc; //(OldWorker.v != 10)*(1 - HC_up - HC_nc) + (OldWorker.v == 10)*0; 
+		return HC_nc~HC_up~HC_down;
+	}
+	else{
+	 	return 1~0~0;
+	}
 }
 #endif
 
@@ -224,11 +241,10 @@ QualityConstraints::Loans(FeasA){
 		n = MaxYrsWrk - OldWorker.v; //to get number of periods left to repay loan
 		geo_series = (1 - r2^n)/(1-r2);
 		sch_repayment = (schloans)/geo_series; //denominator is a geometric series
-
 		n_loans = (asset.actual[asset.v] + wage + transfers .< sch_repayment).*(schloans.*(mu)) + (asset.actual[asset.v] + wage + transfers .> sch_repayment).*(-sch_repayment);	//see if in default or not, choose the correct transition
 		}
 	else{
-		n_loans = -schloans; //so if loans are > 0 when getting old, it goes to zero. 
+		n_loans = -schloans; //so if loans are > 0 when transitioning to old age, it goes to zero. 
 		}
 	return n_loans; 	    
 	}
@@ -309,14 +325,14 @@ sch_repayment1 = (schloans)/geo_series; //denominator is a geometric series
 		sch_repayment2 = (wage + transfers .< sch_repayment1).*(0) + (wage + transfers .>= sch_repayment1).*(-sch_repayment1); 	//only have to repay when grownup
 	}
 	else if(GROWNUp.v == 1 && OldWorker.v == 10){ 
-		sch_repayment2 = zeros(rows(aa(attend)),1); //no repayment in old age  
+		sch_repayment2 = zeros(rows(aa(attend)),1); //no repayment in old age...not correct yet, when = 10 that should be the last repayment.  
 	}
 	else{
 		sch_repayment2 = zeros(rows(aa(attend)),1);  //don't have to repay while in school 
 	}
 	
 /*Consumption*/
-cons = wage + transfers - net_tuition - sch_repayment2 - asset.actual[sav];
+cons = wage + transfers - net_tuition - sch_repayment2 - savings.actual[sav];
 cons = (cons.^(1-rho))/(1-rho);
 
 /*disutility of work + disutility of school*/
