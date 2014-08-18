@@ -1,6 +1,6 @@
 #import "DDP"
 
-struct QualityConstraints : ExPostSmoothing	{	 //ExpostSmoothing just copied from KW
+struct QualityConstraints : ExtremeValue	{	 //ExpostSmoothing just copied from KW
 
 	decl InSubSample;
 		
@@ -31,15 +31,18 @@ struct QualityConstraints : ExPostSmoothing	{	 //ExpostSmoothing just copied fro
 	//**Labels for Phases**//
 	  enum{SchAge, WrkAge, MPhaselabel}
 
-	
+	 enum{gen,spec,Ngrants}	
 	
 	/** State Space Dimensions. @name Dimens **/
-	enum{A1=10, Age0 = 18, MaxXper=5, MaxCredits=5, MaxAgeAtt = 20, MaxAssets = 5, MaxScAssets = 3, MaxYrsWrk = 3, Noffers = 2, MaxHC = 5} // MaxScAssets = 3,
+	enum{Age0 = 18, MaxXper=5, MaxCredits=5, MaxTAtt = 10, MaxAssets = 5, MaxScAssets = 3, MaxYrsWrk = 10, TMax=2+MaxTAtt+MaxYrsWrk,Noffers = 3, MaxHC = 5} // MaxScAssets = 3,
 	//enum{A1=20, Age0 = 18,MaxXper=6, MaxCredits=10, MaxAgeAtt = 20, MaxAssets = 5, MaxScAssets = 5, Noffers = 2, MaxHC = 20}
 	
 	static const decl
-
-	sig = <201.3; 0; 0; 0; 0; 2599; 0; 0; 0; .0473; 0; 0; 498; 0; 6796>, //shock 1: work, shock 2: college attendance, 3: wage
+//		leisuresig = 201.3,
+//		attsig = 2599.0,
+		wagesig = 1.0,
+		
+	sig = <498; 0; 6796>, //shock 1: work, shock 2: college attendance, 3: wage
 
 	//Risk aversion
 	rho = 2, //literature
@@ -92,7 +95,8 @@ struct QualityConstraints : ExPostSmoothing	{	 //ExpostSmoothing just copied fro
 	//minimum earnings
 	omega_1 = 325.2,
 	omega_2 = 51.53, //*H in wage function
-	
+
+	alpha_0 = 2.9,
 	alpha_1 = -.0107, //part-time work
 	alpha_2 = -.4677, //enrolled in school
 	alpha_3 = -.1015, //black
@@ -113,18 +117,19 @@ struct QualityConstraints : ExPostSmoothing	{	 //ExpostSmoothing just copied fro
 	
 	//Tuition & Grants
 	tau_0 = <0, 27530, 16891, 5090, 10540>,  //tuition
-	tau_1 = <-6097, 921.6, -34.7, -4.4, 2234.4, 4366.2, 944.6, 4123.0>,	 //General: Cons, black, income/1000, family assets/1000, SAT_2, SAT_3, Sib, 4 year.
-	tau_2 = <-12641, 6774.1, -71.6, -5.9, 3747.9, 7352.0, 2958.2, 12169.7, 15130.8, -11764.6, -4281.5>; //Specific: Cons, black, income/1000, assets/1000, SAT_2, SAT_3, Sibs, SAT_2private, SAT_3Private, priv_elite, 2-year
+	tau = <-6097, 921.6, -34.7, -4.4, 2234.4, 4366.2, 944.6, 4123.0, 0.0, 0.0, 0.0 ;   //General: Cons, black, income/1000, family assets/1000, SAT_2, SAT_3, Sib, 4 year.
+           -12641, 6774.1, -71.6, -5.9, 3747.9, 7352.0, 2958.2, 12169.7, 15130.8, -11764.6, -4281.5>; //Specific: Cons, black, income/1000, assets/1000, SAT_2, SAT_3, Sibs, SAT_2private, SAT_3Private, priv_elite, 2-year
+//	tau_1 = <-6097, 921.6, -34.7, -4.4, 2234.4, 4366.2, 944.6, 4123.0>,	 //General: Cons, black, income/1000, family assets/1000, SAT_2, SAT_3, Sib, 4 year.
+//	tau_2 = <-12641, 6774.1, -71.6, -5.9, 3747.9, 7352.0, 2958.2, 12169.7, 15130.8, -11764.6, -4281.5>; //Specific: Cons, black, income/1000, assets/1000, SAT_2, SAT_3, Sibs, SAT_2private, SAT_3Private, priv_elite, 2-year
 	
 	static decl 
 		/** index attend school**/  		attend,
 		/*Unobserved HC**/					HC,
 											HC_C,
 											Sch_loans,
-											n_loans,
 											BA,										
 											GrowUp,
-											OldWorker,
+//											OldWorker,
 		/** school choice **/   			schoice,
 		/**work**/							work,
 		/**credits earned**/				Credits,
@@ -136,15 +141,23 @@ struct QualityConstraints : ExPostSmoothing	{	 //ExpostSmoothing just copied fro
 											Wealth,
 											Score,
 											savings,
+											borrow,
 											asset,
 											xft,
 											GROWNUp,
-											shocks,
+											gshocks,
+											wageoffer,
+											leisure,
 											xper,											
 											xpt;
+
+			decl							gross,
+											net_tuition,
+											n_loans;
 		
 	static 	Replicate();
 	static	Reachable();
+			Budget(FeasA);
 			Utility();
 	static	HC_trans(FeasA);
 	static	Transit(FeasA);
