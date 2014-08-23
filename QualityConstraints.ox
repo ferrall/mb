@@ -124,7 +124,7 @@ QualityConstraints::FeasibleActions(const Alpha) {
 	/*Need to limit feasible savings*/
 
 	/*Old Age: No work choice, all full-time*/
-//	if(curt == TMax-2) A.* (Alpha[][work.pos].==2); //work full-time only
+	if(curt == TMax-2) A.* (Alpha[][work.pos].==2); //work full-time only
 
 	/*Need to rule out school borrowing while not attending*/
 	if(SchoolType.v != 0 && GROWNUp.v == 0) A.*= 1 - (Alpha[][attend.pos] == 0).*(Alpha[][borrow.pos] != 0);
@@ -225,9 +225,7 @@ QualityConstraints::Budget(FeasA) {
 
 	 /*Wages*/
 	wage = (wrk1.==0) .? ((omega_1) + (omega_2)*CV(HC))*52
-	                  .: (CV(HC)*exp(alpha_0+alpha_1*(wrk1.==1) + alpha_2*att1 + alpha_3*black + wage_shock))*hours*weeks.*work.actual[wrk1]; //yearly wages too high right now
-
-	println((CV(HC)*exp(alpha_0+alpha_1*(wrk1.==1) + alpha_2*att1 + alpha_3*black + wage_shock))~work.actual[wrk1]'~wage);	//something is wrong here
+	                  .: (CV(HC)*exp(alpha_0+alpha_1*(wrk1.==1) + alpha_2*att1 + alpha_3*black + wage_shock))*hours*weeks.*AV(wrk1)/2; //yearly wages too high right now
 					  
 	/*Parental Transfers*/
 	transfers = (curt>=TMax-2) ? 0 : chi_0 + chi_1*att1 + chi_2*att1*CV(Wealth) + chi_3*(CV(Credits) + 12) + chi_4*Age + chi_7*CV(HC) + chi_8*black + chi_10*AV(wrk1);
