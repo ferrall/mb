@@ -34,8 +34,7 @@ struct QualityConstraints : ExtremeValue	{	 //ExpostSmoothing just copied from K
 	 enum{gen,spec,Ngrants}	
 	
 	/** State Space Dimensions. @name Dimens **/
-	enum{Age0 = 18, MaxXper=5, MaxCredits=5, MaxTAtt = 10, MaxAssets = 5, MaxScAssets = 3, MaxYrsWrk = 10, TMax=2+MaxTAtt+MaxYrsWrk,Noffers = 3, MaxHC = 5} // MaxScAssets = 3,
-	//enum{A1=20, Age0 = 18,MaxXper=6, MaxCredits=10, MaxAgeAtt = 20, MaxAssets = 5, MaxScAssets = 5, Noffers = 2, MaxHC = 20}
+	enum{Age0 = 18, MaxXper=5, MaxCredits=5, MaxTAtt = 10, MaxAssets = 5, MaxScAssets = 3, MaxYrsWrk = 10, TMax=2+MaxTAtt+MaxYrsWrk,Noffers = 3, MaxHC = 5}
 	
 	static const decl
 //		leisuresig = 201.3,
@@ -49,6 +48,8 @@ struct QualityConstraints : ExtremeValue	{	 //ExpostSmoothing just copied from K
 	r= .05, //interest rate regular 
 	r1 = .07,  //interest rate school loans
 	mu = .1, //10% gets added to loans if default
+	hours = 30, //equivalent full-time hours.
+	weeks = 45, //weeks worked per year
 
 	//psychic school costs
 	gamma_44_2 = -36.85, //type 2	unobserved heterogeneity in school attendance
@@ -152,6 +153,8 @@ struct QualityConstraints : ExtremeValue	{	 //ExpostSmoothing just copied from K
 											xpt;
 
 			decl							gross,
+											wage,
+											transfers,
 											net_tuition,
 											n_loans;
 		

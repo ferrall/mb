@@ -45,7 +45,6 @@ SetDelta(0.97);
 		Sch_loans = new Asset("Sch_loans", MaxScAssets, r1, QualityConstraints::Loans),
 		asset = new Asset("asset", MaxAssets, r, QualityConstraints::Savings), 
 		GROWNUp = new LaggedAction("GROWNUp", GrowUp),
-//	    OldWorker = new StateCounter("OldWorker", MaxYrsWrk+MaxTAtt, GROWNUp, 1, 0), //Once it hits 10, workers enter 3rd phase, but need to edit once default is included
 		SchoolType = new PermanentChoice("SchoolType", schoice));
 
 	asset.actual = <0.0, 1000.0, 5000.0, 20000.0, 50000.0>;
@@ -95,7 +94,6 @@ QualityConstraints::FeasibleActions(const Alpha) {
 	decl Borrow_Limit = 0; //calculate state-dependent borrowing limit here. 
 
 	/*Only choice in first period, is which school*/
-//	if (Age == Age0) return !any(Alpha[][attend.pos~work.pos~savings.pos~GrowUp.pos]);
 	if (Age == Age0) return !Alpha[][attend.pos] .* !Alpha[][work.pos] .* !Alpha[][savings.pos] .* !Alpha[][GrowUp.pos]
 							.* !Alpha[][borrow.pos];
 
@@ -125,14 +123,11 @@ QualityConstraints::FeasibleActions(const Alpha) {
 
 	/*Need to limit feasible savings*/
 
-	/*Cannot use student loans to save in first period, can only borrow*/
-//	if(GROWNUp.v == 0) A.*= (Alpha[][savings.pos] .<= 2);
-
 	/*Old Age: No work choice, all full-time*/
-//	if(OldWorker.v == 10) A.* (Alpha[][work.pos].==2); //work full-time, can choose savings, that's it (because of GROWNUP==1 conditions above)
+//	if(curt == TMax-2) A.* (Alpha[][work.pos].==2); //work full-time only
 
 	/*Need to rule out school borrowing while not attending*/
-	if(SchoolType.v != 0 && GROWNUp.v == 0) A.*= 1 - (Alpha[][attend.pos] == 0).*(Alpha[][savings.pos] != 0);
+	if(SchoolType.v != 0 && GROWNUp.v == 0) A.*= 1 - (Alpha[][attend.pos] == 0).*(Alpha[][borrow.pos] != 0);
 
 	return A;
 	}  
@@ -185,16 +180,17 @@ QualityConstraints::HC_trans(FeasA) {
 
 	if(curt<TMax-2){
 		//Experience = probability of going up due to experience: Depends on working (ft vs pt vs not), ability
-		Experience_up = beta_0.*Abil.v + beta_1.*(ivals_work==0) + beta_2.*(ivals_work==1) + beta_3.*(ivals_work==2);
-		Experience_nc = beta_0.*Abil.v + beta_1.*(ivals_work==0) + beta_2.*(ivals_work==1) + beta_3.*(ivals_work==2);
+		Experience_up = beta_0*Abil.v + beta_1*(ivals_work==0) + beta_2*(ivals_work==1) + beta_3*(ivals_work==2);
+		Experience_nc = beta_0*Abil.v + beta_1*(ivals_work==0) + beta_2*(ivals_work==1) + beta_3*(ivals_work==2);
 		//Learning = probability of going up due to learning: Depends on school/attendance/passing the year, if you're working, ability
-		Learning_up = beta_4.*(school_quality==1).*(ivals_attend.==1) + beta_5.*(school_quality==2).*(ivals_attend.==1) + beta_6.*(school_quality==3).*(ivals_attend==1) + beta_7.*(school_quality==4).*(ivals_attend==1);
-		Learning_nc = beta_4.*(school_quality==1).*(ivals_attend.==1) + beta_5.*(school_quality==2).*(ivals_attend.==1) + beta_6.*(school_quality==3).*(ivals_attend==1) + beta_7.*(school_quality==4).*(ivals_attend==1);
+		Learning_up = beta_4*(school_quality==1)*(ivals_attend.==1) + beta_5*(school_quality==2).*(ivals_attend.==1) + beta_6*(school_quality==3)*(ivals_attend==1)
+					  + beta_7*(school_quality==4)*(ivals_attend==1);
+		Learning_nc = beta_4*(school_quality==1)*(ivals_attend.==1) + beta_5*(school_quality==2)*(ivals_attend.==1) + beta_6*(school_quality==3)*(ivals_attend==1)
+					  + beta_7*(school_quality==4)*(ivals_attend==1);
 
-		//Should not accumulate once you are "old age"
-		HC_up = (1 - Grownup)*Learning_up + (Grownup)*Experience_up;	 //	(OldWorker.v != 10)*((1 - Grownup)*Learning + (Grownup)*Experience) + 	(OldWorker.v != 10)*0;
+		HC_up = (1 - Grownup)*Learning_up + (Grownup)*Experience_up;
 		HC_nc = (1 - Grownup)*Learning_nc + (Grownup)*Experience_nc; //need to update this.
-		HC_down = 1 - HC_up - HC_nc; //(OldWorker.v != 10)*(1 - HC_up - HC_nc) + (OldWorker.v == 10)*0; 
+		HC_down = 1 - HC_up - HC_nc; 
 		return HC_up~HC_nc~HC_down;
 	}
 	else{
@@ -218,29 +214,26 @@ QualityConstraints::Budget(FeasA) {
 	gross = net_tuition = n_loans = 0.0;
 	if (curt==0) return 0;
 	
-	decl disu, wage, BA = 0, Age = Age0 + curt, transfers, age = curt + Age0;
+	decl disu, BA = 0, Age = Age0 + curt;
 	decl stype = SchoolType.v, assets = asset.v, black = Race.v, wealth = Wealth.v, inc = Inc.v,
 	ability = Abil.v, score = Score.v, nsib = Nsib.v, schloans = Sch_loans.actual[Sch_loans.v];	//getting values 
 	decl att1 = FeasA[][attend.pos], wrk1 = FeasA[][work.pos], sav1 = FeasA[][borrow.pos];
 
 	decl wage_shock = wagesig*AV(wageoffer);
 
-	decl r2, a, n, geo_series, sch_repayment;
+	decl geo_series, sch_repayment;
 
 	 /*Wages*/
-	wage = (wrk1.==0) .? (omega_1)
-	                  .: (CV(HC)*exp(alpha_0+alpha_1*(wrk1.==1) + alpha_2*att1 + alpha_3*black + wage_shock)); //yearly wages too low right now
+	wage = (wrk1.==0) .? ((omega_1) + (omega_2)*CV(HC))*52
+	                  .: (CV(HC)*exp(alpha_0+alpha_1*(wrk1.==1) + alpha_2*att1 + alpha_3*black + wage_shock))*hours*weeks.*work.actual[wrk1]; //yearly wages too high right now
 
+	println((CV(HC)*exp(alpha_0+alpha_1*(wrk1.==1) + alpha_2*att1 + alpha_3*black + wage_shock))~work.actual[wrk1]'~wage);	//something is wrong here
+					  
 	/*Parental Transfers*/
-	transfers = (curt>=TMax-2) ? 0 : chi_0 + chi_1*att1 + chi_2*att1.*wealth + chi_3*(CV(Credits) + 12) + chi_4*Age + chi_7*CV(HC) + chi_8*black + chi_10*wrk1;
+	transfers = (curt>=TMax-2) ? 0 : chi_0 + chi_1*att1 + chi_2*att1*CV(Wealth) + chi_3*(CV(Credits) + 12) + chi_4*Age + chi_7*CV(HC) + chi_8*black + chi_10*AV(wrk1);
 	gross = AV(asset) + wage + transfers;
 
-	
-/*Transition:
-1)	When in School: Just the amount you borrow
-2) If grownup, depends whether you go into default or not: goes up my mu if in default, otherwise normal repayment
-3) If an old worker, it needs to transition to 0. Need to recheck this. 
-*/
+
 	if(!CV(GROWNUp)){
 		/*Tuition & Grants*/
 		decl grants= 
@@ -256,8 +249,8 @@ QualityConstraints::Budget(FeasA) {
 	else {
 		net_tuition = 0.0;
 		if (curt>=TMax-3) return -schloans; //so if loans are > 0 when transitioning to old age, it goes to zero. 
-		r2 = 1/(1+r1);
-		geo_series = (1 - r2^(TMax-2 - curt))/(1-r2);
+	//	r2 = 1/(1+r1);
+		geo_series = (1 - (1/(1+r1))^(TMax-2 - curt))/(1-(1/(1+r1)));
 		sch_repayment = (schloans)/geo_series; //denominator is a geometric series
 		n_loans = (gross .< sch_repayment) .? mu*schloans .: -sch_repayment;	//see if in default or not, choose the correct transition
 		return n_loans;
@@ -270,7 +263,7 @@ QualityConstraints::Transit(FeasA){
 	if(GROWNUp.v == 0){
 		decl ivals_work = FeasA[][work.pos], ivals_attend = FeasA[][attend.pos];
 		decl ability_1 = Abil.v;
-		decl pi_f = theta_1.*ability_1 + theta_3.*curt + theta_5.*(ivals_work.==0) + (theta_5 + theta_6).*(ivals_work.<=.5) + (theta_5 + theta_6 + theta_7).*(ivals_work.==1); 
+		decl pi_f = theta_1*ability_1 + theta_3*curt + theta_5*(ivals_work.==0) + (theta_5 + theta_6)*(ivals_work.<=.5) + (theta_5 + theta_6 + theta_7)*(ivals_work.==1); 
 		decl prob_fail = 1/(1+exp(pi_f)); 
 		return 0~(prob_fail)~(1-prob_fail); //stay the same, up 1, down 1
 	}
@@ -285,15 +278,18 @@ QualityConstraints::Utility() {
 
 	if (curt==TMax-1 || curt==0) return zeros(rows(A[Aind]),1);
 
-	/*Getting values for i.i.d. shocks (can clean this up later)*/
 	decl cons =	/*Consumption*/
-		gross - net_tuition - n_loans - aa(savings) + aa(borrow);  //??
+		//gross - net_tuition - n_loans - savings.actual[aa(savings)]' + borrow.actual[aa(borrow)]'; //not right?
+		//net-savings is state-and action-dependent change in asset holding:
+		wage + transfers - net_tuition - n_loans - savings.actual[aa(savings)]' + borrow.actual[aa(borrow)]'; //is this right?
 
 	/*Total one period utility*/
-	decl util = cons .<= 0.0 .? -.Inf .:  (cons.^(1-rho))/(1-rho) + aa(attend)*gamma_20 + aa(work)*gamma_22;  //Danger!!!!
-	if (!any(util .!= -.Inf)) {
-		println(curt," ",CV(HC)," ",CV(asset)," ",CV(GROWNUp)," ",CV(Sch_loans)," ",net_tuition," ",n_loans," ",gross,util');
-		}
+	decl util = cons .<= 0.0 .? -.Inf .:  (cons.^(1-rho))/(1-rho) + aa(attend)*gamma_20 + aa(work)*gamma_22;
+
+//after raising wages, problem below is not an issue
+//	if (!any(util .!= -.Inf)) {
+//		println(cons~AV(asset)~gross~savings.actual[aa(savings)]);
+//		}
 
 	return util;
 	}
@@ -301,12 +297,8 @@ QualityConstraints::Utility() {
 /*
 Need to add:
 0) Finding errors.
-1)
-	a) Borrowing limits - function of current states - age and human capital?
-	b) make sure consumption has to be positive. 
+1)	a) Borrowing limits - function of current states - age and human capital?
 3) Degree status - needs to be in a state block with credits?
-4) Years in the second phase - need to add 5 if you end up defaulting - not sure how to do this?
 5) different interest rates for borrowing and saving?
-6) use functions for the repayment and wages that end up being used over and over again?
 7) Need to fix human capital probabilities
 */
