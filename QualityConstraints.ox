@@ -4,7 +4,7 @@
 
 QualityConstraints::Replicate(){
 
-decl KW;
+decl KW, PD;
 
 Initialize(1.0,Reachable, TRUE, 0);
 SetClock(UncertainLongevity,TMax,0.0);
@@ -82,6 +82,12 @@ SetDelta(0.97);
 	decl Emax = new ValueIteration(0);
 	Emax.Volume = SILENT;
 	Emax -> Solve(0,0);
+/*
+	PD = new PanelPrediction(0);
+	PD -> Predict(20);
+	PD -> Histogram(savings,TRUE,TRUE);			
+	delete PD;
+*/
 #endif
 
 }
@@ -173,24 +179,17 @@ QualityConstraints::Reachable() {
 
 #ifdef RandomHumanCapital	//based on school attendance, simple up or down  
 QualityConstraints::HC_trans(FeasA) {
-	decl ivals_work = FeasA[][work.pos];
-	decl ivals_attend = FeasA[][attend.pos];
-	decl school_quality = SchoolType.v, Grownup = GROWNUp.v;
-	decl Learning_up, Learning_nc, Experience_up, Experience_nc, HC_up, HC_nc, HC_down;
+	decl HC_up, HC_nc, HC_down;
 
 	if(curt<TMax-2){
-		//Experience = probability of going up due to experience: Depends on working (ft vs pt vs not), ability
-		Experience_up = beta_0*Abil.v + beta_1*(ivals_work==0) + beta_2*(ivals_work==1) + beta_3*(ivals_work==2);
-		Experience_nc = beta_0*Abil.v + beta_1*(ivals_work==0) + beta_2*(ivals_work==1) + beta_3*(ivals_work==2);
-		//Learning = probability of going up due to learning: Depends on school/attendance/passing the year, if you're working, ability
-		Learning_up = beta_4*(school_quality==1)*(ivals_attend.==1) + beta_5*(school_quality==2).*(ivals_attend.==1) + beta_6*(school_quality==3)*(ivals_attend==1)
-					  + beta_7*(school_quality==4)*(ivals_attend==1);
-		Learning_nc = beta_4*(school_quality==1)*(ivals_attend.==1) + beta_5*(school_quality==2)*(ivals_attend.==1) + beta_6*(school_quality==3)*(ivals_attend==1)
-					  + beta_7*(school_quality==4)*(ivals_attend==1);
+		//If not grownup, then HC transition based on learning. Otherwise based on working
+		HC_up =	AV(GROWNUp) == 0 ? beta_4*(AV(SchoolType)==1)*(FeasA[][attend.pos].==1) + beta_5*(AV(SchoolType)==2).*(FeasA[][attend.pos].==1)
+							+ beta_6*(AV(SchoolType)==3)*(FeasA[][attend.pos].==1) + beta_7*(AV(SchoolType)==4)*(FeasA[][attend.pos].==1)  //Learnings
+								 : beta_0 + beta_1*(FeasA[][work.pos].==0) + beta_2*(FeasA[][work.pos].==1); //working
 
-		HC_up = (1 - Grownup)*Learning_up + (Grownup)*Experience_up;
-		HC_nc = (1 - Grownup)*Learning_nc + (Grownup)*Experience_nc; //need to update this.
-		HC_down = 1 - HC_up - HC_nc; 
+		HC_nc =	AV(GROWNUp) == 0 ? beta_4*(AV(SchoolType)==1)*(FeasA[][attend.pos].==1) + beta_5*(AV(SchoolType)==2).*(FeasA[][attend.pos].==1) //Learning								  
+								 : beta_0 + beta_1*(FeasA[][work.pos].==0) + beta_2*(FeasA[][work.pos].==1) + beta_3*(FeasA[][work.pos].==2); //working
+		HC_down = 1 - HC_up - HC_nc;
 		return HC_up~HC_nc~HC_down;
 	}
 	else{
@@ -247,7 +246,6 @@ QualityConstraints::Budget(FeasA) {
 	else {
 		net_tuition = 0.0;
 		if (curt>=TMax-3) return -schloans; //so if loans are > 0 when transitioning to old age, it goes to zero. 
-	//	r2 = 1/(1+r1);
 		geo_series = (1 - (1/(1+r1))^(TMax-2 - curt))/(1-(1/(1+r1)));
 		sch_repayment = (schloans)/geo_series; //denominator is a geometric series
 		n_loans = (gross .< sch_repayment) .? mu*schloans .: -sch_repayment;	//see if in default or not, choose the correct transition
