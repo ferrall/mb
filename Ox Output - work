@@ -1,0 +1,197 @@
+--------------- Ox at 10:19:09 on 04-Sep-2014 ---------------
+
+Ox Console version 7.01 (Windows/U) (C) J.A. Doornik, 1994-2013
+This version may be used for academic research and teaching only
+
+ niqlow version 1.00 Copyright (C) 2011-2014 Christopher Ferrall.
+ Execution of niqlow implies acceptance of its free software License (niqlow/niqlow-license.txt).
+-------------------- DP Model Summary ------------------------
+STATE VARIABLES
+              |eps                 |eta |theta                                    -clock        |gamma
+                w   eps0   eps1    s21     HC  Credi  Sch_l  asset  GROWN  Schoo      t     t'      r   abil   race  score  wealt  incom   nsib
+       s.N      3      3      3      1      5      5      3      5      2      5     22      2      1      3      2      1      1      1      1
+
+
+Transition Categories (not counting fixed)
+                 NonRandom       Random   Coevolving
+     #Vars               2            5            9
+
+Size of Spaces
+                           N
+        Exogenous         27
+    SemiExogenous          1
+       Endogenous       3750
+            Times         22
+    EV()Iterating       7500
+    Ch.Prob.track      82500
+    TotalReachable      4755
+         Terminal          0
+     Random Groups         1
+     Fixed Groups          6
+    TotalUntrimmed  13365000
+
+ACTION VARIABLES (900 distinct actions)
+          work  atten  GrowU  savin  loans  schoi
+    i.N      3      2      2      5      3      5
+
+
+ACTION SETS
+    alpha       A[0]     A[1]     A[2]     A[3]     A[4]   
+    (000000)      X        -        X        X        X    
+    (100000)      X        -        X        X        -    
+    (200000)      X        -        X        X        -    
+    (010000)      X        -        X        -        -    
+    (110000)      X        -        X        -        -    
+    (210000)      X        -        X        -        -    
+    (001000)      X        X        X        X        -    
+    (101000)      X        X        X        X        -    
+    (201000)      X        X        X        X        -    
+    (001100)      X        X        -        -        -    
+    (101100)      X        X        -        -        -    
+    (201100)      X        X        -        -        -    
+    (001200)      X        X        -        -        -    
+    (101200)      X        X        -        -        -    
+    (201200)      X        X        -        -        -    
+    (001300)      X        X        -        -        -    
+    (101300)      X        X        -        -        -    
+    (201300)      X        X        -        -        -    
+    (001400)      X        X        -        -        -    
+    (101400)      X        X        -        -        -    
+    (201400)      X        X        -        -        -    
+    (000010)      X        -        X        X        -    
+    (100010)      X        -        X        X        -    
+    (200010)      X        -        X        X        -    
+    (010010)      X        -        X        -        -    
+    (110010)      X        -        X        -        -    
+    (210010)      X        -        X        -        -    
+    (001010)      X        -        X        X        -    
+    (101010)      X        -        X        X        -    
+    (201010)      X        -        X        X        -    
+    (000020)      X        -        X        X        -    
+    (100020)      X        -        X        X        -    
+    (200020)      X        -        X        X        -    
+    (010020)      X        -        X        -        -    
+    (110020)      X        -        X        -        -    
+    (210020)      X        -        X        -        -    
+    (001020)      X        -        X        X        -    
+    (101020)      X        -        X        X        -    
+    (201020)      X        -        X        X        -    
+    (000001)      X        -        -        -        X    
+    (000002)      X        -        -        -        X    
+    (000003)      X        -        -        -        X    
+    (000004)      X        -        -        -        X    
+#States           0     1450     2640      660        5
+    Key: X = row vector is feasible. - = infeasible
+    Actions vectors not shown because they are never feasible: 857
+
+      0.00000
+      0.00000
+       1.0000
+      0.00000
+      0.00000
+Histogram of work
+t= 0
+ v    pct
+ 0 1.0000
+ 1 0.0000
+ 2 0.0000
+t= 1
+ v    pct
+ 0 0.0000
+ 1 0.0033
+ 2 0.4514
+t= 2
+ v    pct
+ 0 0.0000
+ 1 0.0000
+ 2 0.0003
+t= 3
+ v    pct
+ 0 0.0000
+ 1 0.0000
+ 2 0.0000
+t= 4
+ v    pct
+ 0 0.0000
+ 1 0.0000
+ 2 0.0000
+t= 5
+ v    pct
+ 0 0.0000
+ 1 0.0000
+ 2 0.0000
+t= 6
+ v    pct
+ 0 0.0000
+ 1 0.0000
+ 2 0.0000
+t= 7
+ v    pct
+ 0 0.0000
+ 1 0.0000
+ 2 0.0000
+t= 8
+ v    pct
+ 0 0.0000
+ 1 0.0000
+ 2 0.0000
+t= 9
+ v    pct
+ 0 0.0000
+ 1 0.0000
+ 2 0.0000
+t= 10
+ v    pct
+ 0 0.0000
+ 1 0.0000
+ 2 0.0000
+t= 11
+ v    pct
+ 0 0.0000
+ 1 0.0000
+ 2 0.0000
+t= 12
+ v    pct
+ 0 0.0000
+ 1 0.0000
+ 2 0.0000
+t= 13
+ v    pct
+ 0 0.0000
+ 1 0.0000
+ 2 0.0000
+t= 14
+ v    pct
+ 0 0.0000
+ 1 0.0000
+ 2 0.0000
+t= 15
+ v    pct
+ 0 0.0000
+ 1 0.0000
+ 2 0.0000
+t= 16
+ v    pct
+ 0 0.0000
+ 1 0.0000
+ 2 0.0000
+t= 17
+ v    pct
+ 0 0.0000
+ 1 0.0000
+ 2 0.0000
+t= 18
+ v    pct
+ 0 0.0000
+ 1 0.0000
+ 2 0.0000
+t= 19
+ v    pct
+ 0 0.0000
+ 1 0.0000
+ 2 0.0000
+t= 20
+ v    pct
+ 0 0.0000
+ 1 0.0000
+ 2 0.0000

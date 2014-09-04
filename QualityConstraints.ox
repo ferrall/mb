@@ -56,7 +56,7 @@ SetDelta(0.97);
   		xper = new ActionAccumulator("xper", MaxXper, work), //adds 1 for part-time, 2 for full-time, max of 10 years of experience, but this should only increase if in phase 1. 				
 		Credits= new RandomUpDown("Credits", MaxCredits, QualityConstraints::Transit),
 		//Sch_loans = ActionAccumulator("Sch_Loans", Sch_borrowing),
-		assets = new LaggedAction("assets", savings), //Need appropriate transtion
+		assets = new LaggedAction("assets", savings),
 		GROWNUp = new ActionTracker("GROWNUp", GrowUp, 1), 
 		SchoolType = new PermanentChoice("SchoolType", schoice));
 #endif
@@ -82,7 +82,7 @@ SetDelta(0.97);
 	decl Emax = new ValueIteration(0);
 	Emax.Volume = SILENT;
 	Emax -> Solve(0,0);
-
+//	DPDebug::outV(TRUE,0);
 	PD = new PanelPrediction(0);
 	PD -> Predict(20);
 	PD -> Histogram(work,TRUE,TRUE);			
