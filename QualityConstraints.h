@@ -72,6 +72,13 @@ struct QualityConstraints : ExtremeValue	{	 //ExpostSmoothing just copied from K
 	phi_7 = -.0709, //type 2
 	phi_8 = -.2264,	 //type 3.
 
+	//Asset lower limit
+	mu_0 = .5523,
+	mu_1 = .0984,
+	mu_2 = -.0011,
+	mu_3 = .2507,
+	mu_4 = .4159,
+
 	//credit passing/failing
 	theta_0 = <-4.00,1.00,-2.04,2.40>, //un observedtype 1, 2, 3, 4
 	theta_1 = 1.08,	//GPA (i'll make this ability)

@@ -4,7 +4,7 @@
 
 QualityConstraints::Replicate(){
 
-decl KW, PD;
+decl KW, PD, PS, vmat;
 
 Initialize(1.0,Reachable, TRUE, 0);
 SetClock(UncertainLongevity,TMax,0.0);
@@ -82,12 +82,25 @@ SetDelta(0.97);
 	decl Emax = new ValueIteration(0);
 	Emax.Volume = SILENT;
 	Emax -> Solve(0,0);
-/*
+
 	PD = new PanelPrediction(0);
 	PD -> Predict(20);
-	PD -> Histogram(savings,TRUE,TRUE);			
+	PD -> Histogram(work,TRUE,TRUE);			
 	delete PD;
+ /*
+	DPDebug::outV(TRUE,&vmat);
+	PS = new Panel(1,0);
+	PS = Simulate(10,20,0,TRUE);
+		DPDebug::outV(TRUE,&vmat);	   //just printing value function
+		chprob |= reverser(vmat[][sizec(vmat)-1]');
+		ps[row] = new Panel(row,0);	//making new panel
+		ps[row] -> Simulate(10,400,0,TRUE);  //draw from ergodic distn.
+		//Simulate ( N , T , ErgOrStateMat , DropTerminal ) -> (Paths, time periods, 0, TRUE)
+		ps[row]->Flat();		
+		data |= selectifr(ps[row].flat,ps[row].flat[][columns(ps[row].flat)-1]);
+		}
 */
+
 #endif
 
 }
@@ -95,9 +108,10 @@ SetDelta(0.97);
 /**CONSTRAINTS ON CHOICE:**/
 QualityConstraints::FeasibleActions(const Alpha) {
 	
-	decl Age = curt + Age0, A;
+	decl Age = curt + Age0, A, B_Limit_Sav, B_Limit_Borrow;
 
-	decl Borrow_Limit = 0; //calculate state-dependent borrowing limit here. 
+	/*Calculate state-dependent borrowing limit here*/
+	B_Limit_Sav =  exp(mu_0 + mu_1*HC.v + mu_2*HC.v^2 + mu_3*Age + mu_4*(Age > 23));  //too small right now.
 
 	/*Only choice in first period, is which school*/
 	if (Age == Age0) return !Alpha[][attend.pos] .* !Alpha[][work.pos] .* !Alpha[][savings.pos] .* !Alpha[][GrowUp.pos]
@@ -122,24 +136,25 @@ QualityConstraints::FeasibleActions(const Alpha) {
 	if (GROWNUp.v == 1) {
 		A .*= (Alpha[][GrowUp.pos].==1); 
 		A .*= (Alpha[][attend.pos].==0);  	/*rule out school attendance when grownup = 0*/
-		A .*= (Alpha[][borrow.pos].==0);
+		A .*= (Alpha[][borrow.pos].==0);	/*would need to change if change grid points*/
 		}
 	else
-		A .*= Alpha[][savings.pos].==0;
+		A .*= Alpha[][savings.pos].==0;	 /*Would need to change if i change the grid points for savings*/
 
 	/*Need to limit feasible savings*/
+	//Not taking into account wages etc etc. where should this be done?
+//	A.*= 1 - (asset.actual[asset.v] + savings.actual[savings.pos] .< B_Limit_Sav);
 
 	/*Old Age: No work choice, all full-time*/
 	if(curt == TMax-2) A.* (Alpha[][work.pos].==2); //work full-time only
 
 	/*Need to rule out school borrowing while not attending*/
-	if(SchoolType.v != 0 && GROWNUp.v == 0) A.*= 1 - (Alpha[][attend.pos] == 0).*(Alpha[][borrow.pos] != 0);
+	if(SchoolType.v != 0 && GROWNUp.v == 0) A.*= 1 - (Alpha[][attend.pos] == 0).*(Alpha[][borrow.pos] != 0);   //need to change if change gridpoints
 
 	return A;
 	}  
 	 
 QualityConstraints::Reachable() {
-	//CF: many other unreachable states
 #ifdef RandomHumanCapital
 		decl MaxEarned = curt, Cr = Credits.v;
 
@@ -153,9 +168,10 @@ QualityConstraints::Reachable() {
 			//cant be grown up in initial decision
 			//can't be mature worker in inital decision
 			//can't start off with student loans
+			//Need to change assets if change grid points
 			}
 		if (!CV(GROWNUp)) {
-		   if (CV(asset) || curt>MaxTAtt) return 0;
+		   if (CV(asset) || curt>MaxTAtt) return 0;	 //need to change assets if i change grid points
 		   }
 		//first phase
 		if (CV(Credits) > curt) return 0;	 //Need to edit this once more than 1 credit a year (covers first phase as well)
@@ -201,6 +217,9 @@ QualityConstraints::HC_trans(FeasA) {
 //Net savings for regular asset
 QualityConstraints::Savings(FeasA){
 	return savings.actual[FeasA[][savings.pos]]';
+
+//Not taking into account wages etc etc. where should this be done?
+//	A.*= 1 - (asset.actual[asset.v] + savings.actual[savings.pos] .< B_Limit_Sav);
 	}
 
 QualityConstraints::Loans(FeasA){
@@ -213,29 +232,27 @@ QualityConstraints::Budget(FeasA) {
 	gross = net_tuition = n_loans = 0.0;
 	if (curt==0) return 0;
 	
-	decl disu, BA = 0, Age = Age0 + curt;
-	decl stype = SchoolType.v, assets = asset.v, black = Race.v, wealth = Wealth.v, inc = Inc.v,
-	ability = Abil.v, score = Score.v, nsib = Nsib.v, schloans = Sch_loans.actual[Sch_loans.v];	//getting values 
+	decl BA = 0, Age = Age0 + curt, sch_repayment;
+	decl stype = SchoolType.v, score = Score.v, schloans = Sch_loans.actual[Sch_loans.v];	//getting values 
 	decl att1 = FeasA[][attend.pos], wrk1 = FeasA[][work.pos], sav1 = FeasA[][borrow.pos];
-
 	decl wage_shock = wagesig*AV(wageoffer);
-
-	decl geo_series, sch_repayment;
 
 	 /*Wages*/
 	wage = (wrk1.==0) .? ((omega_1) + (omega_2)*CV(HC))*52
-	                  .: (CV(HC)*exp(alpha_0+alpha_1*(wrk1.==1) + alpha_2*att1 + alpha_3*black + wage_shock))*hours*weeks.*AV(wrk1)/2; //yearly wages too high right now
+	                  .: (CV(HC)*exp(alpha_0+alpha_1*(wrk1.==1) + alpha_2*att1 + alpha_3*CV(Race) + wage_shock))*hours*weeks.*AV(wrk1)/2; //yearly wages too high right now
 					  
 	/*Parental Transfers*/
-	transfers = (curt>=TMax-2) ? 0 : chi_0 + chi_1*att1 + chi_2*att1*CV(Wealth) + chi_3*(CV(Credits) + 12) + chi_4*Age + chi_7*CV(HC) + chi_8*black + chi_10*AV(wrk1);
+	transfers = (curt>=TMax-2) ? 0 : chi_0 + chi_1*att1 + chi_2*att1*CV(Wealth) + chi_3*(CV(Credits) + 12) + chi_4*Age + chi_7*CV(HC) + chi_8*CV(Race) + chi_10*AV(wrk1);
 	gross = AV(asset) + wage + transfers;
 
+//Not taking into account wages etc etc. where should this be done?
+//	A.*= 1 - (asset.actual[asset.v] + savings.actual[savings.pos] .< B_Limit_Sav);
 
 	if(!CV(GROWNUp)){
 		/*Tuition & Grants*/
 		decl grants= 
 			setbounds(
-				tau* (1|black|inc|wealth|(score==1)|(score==2)|nsib|((score==1)&&(stype==2))|((score==2)&&(stype==2))|(stype==1) | 0.0 )  //4 year
+				tau* (1|CV(Race)|CV(Inc)|CV(Wealth)|(score==1)|(score==2)|CV(Nsib)|((score==1)&&(stype==2))|((score==2)&&(stype==2))|(stype==1) | 0.0 )  //4 year
 				+ AV(gshocks)'
 				,0.0,+.Inf);
 		//no one is getting grants right now with these parameter values
@@ -246,8 +263,7 @@ QualityConstraints::Budget(FeasA) {
 	else {
 		net_tuition = 0.0;
 		if (curt>=TMax-3) return -schloans; //so if loans are > 0 when transitioning to old age, it goes to zero. 
-		geo_series = (1 - (1/(1+r1))^(TMax-2 - curt))/(1-(1/(1+r1)));
-		sch_repayment = (schloans)/geo_series; //denominator is a geometric series
+		sch_repayment = (schloans)/(1 - (1/(1+r1))^(TMax-2 - curt))/(1-(1/(1+r1))); //denominator is a geometric series
 		n_loans = (gross .< sch_repayment) .? mu*schloans .: -sch_repayment;	//see if in default or not, choose the correct transition
 		return n_loans;
 		}
@@ -258,8 +274,7 @@ QualityConstraints::Transit(FeasA){
 
 	if(GROWNUp.v == 0){
 		decl ivals_work = FeasA[][work.pos], ivals_attend = FeasA[][attend.pos];
-		decl ability_1 = Abil.v;
-		decl pi_f = theta_1*ability_1 + theta_3*curt + theta_5*(ivals_work.==0) + (theta_5 + theta_6)*(ivals_work.<=.5) + (theta_5 + theta_6 + theta_7)*(ivals_work.==1); 
+		decl pi_f = theta_1*CV(Abil) + theta_3*curt + theta_5*(ivals_work.==0) + (theta_5 + theta_6)*(ivals_work.<=.5) + (theta_5 + theta_6 + theta_7)*(ivals_work.==1); 
 		decl prob_fail = 1/(1+exp(pi_f)); 
 		return 0~(prob_fail)~(1-prob_fail); //stay the same, up 1, down 1
 	}
@@ -292,9 +307,8 @@ QualityConstraints::Utility() {
 	
 /*
 Need to add:
-0) Finding errors.
-1)	a) Borrowing limits - function of current states - age and human capital?
-3) Degree status - needs to be in a state block with credits?
-5) different interest rates for borrowing and saving?
-7) Need to fix human capital probabilities
+1)	Borrowing limits - function of current states - age and human capital?
+2) Degree status - needs to be in a state block with credits?
+3) different interest rates for borrowing and saving?
+4) Need to fix human capital probabilities
 */
