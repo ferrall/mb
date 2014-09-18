@@ -1,4 +1,4 @@
---------------- Ox at 15:13:58 on 15-Sep-2014 ---------------
+--------------- Ox at 10:16:37 on 04-Sep-2014 ---------------
 
 Ox Console version 7.01 (Windows/U) (C) J.A. Doornik, 1994-2013
 This version may be used for academic research and teaching only
@@ -6,7 +6,6 @@ This version may be used for academic research and teaching only
  niqlow version 1.00 Copyright (C) 2011-2014 Christopher Ferrall.
  Execution of niqlow implies acceptance of its free software License (niqlow/niqlow-license.txt).
 -------------------- DP Model Summary ------------------------
-Clock Class: 6 Description: Uncertain Longevity (finite horizon until last period which ends randomly)
 STATE VARIABLES
               |eps                 |eta |theta                                    -clock        |gamma
                 w   eps0   eps1    s21     HC  Credi  Sch_l  asset  GROWN  Schoo      t     t'      r   abil   race  score  wealt  incom   nsib
@@ -25,6 +24,8 @@ Size of Spaces
             Times         22
     EV()Iterating       7500
     Ch.Prob.track      82500
+    TotalReachable      4755
+         Terminal          0
      Random Groups         1
      Fixed Groups          6
     TotalUntrimmed  13365000
@@ -33,11 +34,6 @@ ACTION VARIABLES (900 distinct actions)
           work  atten  GrowU  savin  loans  schoi
     i.N      3      2      2      5      3      5
 
-
- Trimming 
-                           N
-    TotalReachable      4755
-         Terminal          0
 
 ACTION SETS
     alpha       A[0]     A[1]     A[2]     A[3]     A[4]   
@@ -88,413 +84,93 @@ ACTION SETS
     Key: X = row vector is feasible. - = infeasible
     Actions vectors not shown because they are never feasible: 857
 
-----------------------------
- Histogram of work
-t=0
-
- v      pct
- 0 1.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=1
-
- v      pct
- 0 0.000025
- 1 0.003266
- 2 0.451444
-  Average: 0.906154
-
-t=2
-
- v      pct
- 0 0.000000
- 1 0.000002
- 2 0.000340
-  Average: 0.000683411
-
-t=3
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 1.61947e-007
-
-t=4
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 1.70023e-012
-
-t=5
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 8.05673e-019
-
-t=6
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 1.82966e-026
-
-t=7
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 2.03274e-035
-
-t=8
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 1.10819e-045
-
-t=9
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 3.00384e-057
-
-t=10
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 4.13543e-070
-
-t=11
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=12
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=13
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=14
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=15
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=16
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=17
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=18
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=19
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=20
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=21
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=22
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=23
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=24
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=25
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=26
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=27
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=28
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=29
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=30
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=31
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=32
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=33
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=34
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=35
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=36
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=37
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=38
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=39
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=40
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=41
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=42
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=43
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=44
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=45
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=46
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=47
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=48
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=49
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
-t=50
-
- v      pct
- 0 0.000000
- 1 0.000000
- 2 0.000000
-  Average: 0
-
+      0.00000
+      0.00000
+       1.0000
+      0.00000
+      0.00000
+Histogram of GrowUp
+t= 0
+ v    pct
+ 0 1.0000
+ 1 0.0000
+t= 1
+ v    pct
+ 0 0.2293
+ 1 0.2254
+t= 2
+ v    pct
+ 0 0.0002
+ 1 0.0002
+t= 3
+ v    pct
+ 0 0.0000
+ 1 0.0000
+t= 4
+ v    pct
+ 0 0.0000
+ 1 0.0000
+t= 5
+ v    pct
+ 0 0.0000
+ 1 0.0000
+t= 6
+ v    pct
+ 0 0.0000
+ 1 0.0000
+t= 7
+ v    pct
+ 0 0.0000
+ 1 0.0000
+t= 8
+ v    pct
+ 0 0.0000
+ 1 0.0000
+t= 9
+ v    pct
+ 0 0.0000
+ 1 0.0000
+t= 10
+ v    pct
+ 0 0.0000
+ 1 0.0000
+t= 11
+ v    pct
+ 0 0.0000
+ 1 0.0000
+t= 12
+ v    pct
+ 0 0.0000
+ 1 0.0000
+t= 13
+ v    pct
+ 0 0.0000
+ 1 0.0000
+t= 14
+ v    pct
+ 0 0.0000
+ 1 0.0000
+t= 15
+ v    pct
+ 0 0.0000
+ 1 0.0000
+t= 16
+ v    pct
+ 0 0.0000
+ 1 0.0000
+t= 17
+ v    pct
+ 0 0.0000
+ 1 0.0000
+t= 18
+ v    pct
+ 0 0.0000
+ 1 0.0000
+t= 19
+ v    pct
+ 0 0.0000
+ 1 0.0000
+t= 20
+ v    pct
+ 0 0.0000
+ 1 0.0000

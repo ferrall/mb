@@ -4,11 +4,13 @@
 
 QualityConstraints::Replicate(){
 
-decl KW, PD, PS, vmat;
+decl KW, PD, PS, vmat, expbirths, t;
 
 Initialize(1.0,Reachable, TRUE, 0);
 SetClock(UncertainLongevity,TMax,0.0);
 SetDelta(0.97);
+
+//schoice = 0;
 
 /**Actions**/
 	Actions(
@@ -16,7 +18,7 @@ SetDelta(0.97);
 		attend = new ActionVariable("attend", MAttendlabel), //attend school
 	 	GrowUp = new ActionVariable("GrowUp", MPhaselabel),  
 		savings = new ActionVariable("savings", MaxAssets),
-		borrow = new ActionVariable("loans",3),
+		borrow = new ActionVariable("loans",3) ,
 		schoice = new ActionVariable("schoice", MSchooltype) //school choice
 	);
 
@@ -38,6 +40,9 @@ SetDelta(0.97);
 
 //ENDOGENOUS STATES:
 #ifdef RandomHumanCapital
+
+//	SchoolType = 0;
+
 	EndogenousStates(
  		HC = new RandomUpDown("HC", MaxHC, QualityConstraints::HC_trans),				
 		Credits= new RandomUpDown("Credits", MaxCredits, QualityConstraints::Transit),
@@ -45,20 +50,23 @@ SetDelta(0.97);
 		Sch_loans = new Asset("Sch_loans", MaxScAssets, r1, QualityConstraints::Loans),
 		asset = new Asset("asset", MaxAssets, r, QualityConstraints::Savings), 
 		GROWNUp = new LaggedAction("GROWNUp", GrowUp),
-		SchoolType = new PermanentChoice("SchoolType", schoice));
+		SchoolType = new PermanentChoice("SchoolType", schoice)
+		);
 
 	asset.actual = <0.0, 1000.0, 5000.0, 20000.0, 50000.0>;
 	Sch_loans.actual = <0.0, 1000.0, 5000.0, 20000.0, 50000.0>;
 		
 #else
 
+
 	EndogenousStates(
   		xper = new ActionAccumulator("xper", MaxXper, work), //adds 1 for part-time, 2 for full-time, max of 10 years of experience, but this should only increase if in phase 1. 				
 		Credits= new RandomUpDown("Credits", MaxCredits, QualityConstraints::Transit),
 		//Sch_loans = ActionAccumulator("Sch_Loans", Sch_borrowing),
 		assets = new LaggedAction("assets", savings),
-		GROWNUp = new ActionTracker("GROWNUp", GrowUp, 1), 
-		SchoolType = new PermanentChoice("SchoolType", schoice));
+		GROWNUp = new ActionTracker("GROWNUp", GrowUp, 1 //), 
+//		SchoolType = new PermanentChoice("SchoolType", schoice)
+);
 #endif
 
 //FIXED EFFECTS
@@ -72,34 +80,35 @@ SetDelta(0.97);
 	
 #ifdef KWApprox	
 	CreateSpaces();
-	Volume = SILENT;
+//	Volume = SILENT;
 	KW = new KeaneWolpin(ones(1,10)~constant(0.1,1,A1-10),0);
-	KW.Volume = SILENT;
+//	KW.Volume = SILENT;
 	KW -> Solve();
 #else
 	CreateSpaces();
-	Volume = SILENT;
+	Volume = NOISY;
 	decl Emax = new ValueIteration(0);
-	Emax.Volume = SILENT;
+//	Emax.Volume = NOISY;
 	Emax -> Solve(0,0);
 //	DPDebug::outV(TRUE,0);
 	PD = new PanelPrediction(0);
-	PD -> Predict(20);
-	PD -> Histogram(work,TRUE,TRUE);			
+	PD -> Predict(50);
+	PD -> Histogram(GROWNUp,TRUE,TRUE);
 	delete PD;
- /*
-	DPDebug::outV(TRUE,&vmat);
+
+
+	DPDebug::outV(TRUE,0);
 	PS = new Panel(1,0);
-	PS = Simulate(10,20,0,TRUE);
-		DPDebug::outV(TRUE,&vmat);	   //just printing value function
-		chprob |= reverser(vmat[][sizec(vmat)-1]');
-		ps[row] = new Panel(row,0);	//making new panel
-		ps[row] -> Simulate(10,400,0,TRUE);  //draw from ergodic distn.
+//	PS = Simulate(10,20,0,TRUE);
+//		DPDebug::outV(TRUE,&vmat);	   //just printing value function
+//		chprob |= reverser(vmat[][sizec(vmat)-1]');
+//		ps[row] = new Panel(row,0);	//making new panel
+//		ps[row] -> Simulate(10,400,0,TRUE);  //draw from ergodic distn.
 		//Simulate ( N , T , ErgOrStateMat , DropTerminal ) -> (Paths, time periods, 0, TRUE)
-		ps[row]->Flat();		
-		data |= selectifr(ps[row].flat,ps[row].flat[][columns(ps[row].flat)-1]);
-		}
-*/
+//		ps[row]->Flat();		
+//		data |= selectifr(ps[row].flat,ps[row].flat[][columns(ps[row].flat)-1]);
+//		}
+
 
 #endif
 
@@ -111,7 +120,7 @@ QualityConstraints::FeasibleActions(const Alpha) {
 	decl Age = curt + Age0, A, B_Limit_Sav, B_Limit_Borrow;
 
 	/*Calculate state-dependent borrowing limit here*/
-	B_Limit_Sav =  exp(mu_0 + mu_1*HC.v + mu_2*HC.v^2 + mu_3*Age + mu_4*(Age > 23));  //too small right now.
+	B_Limit_Sav =  exp(mu_0 + mu_1*CV(HC) + mu_2*CV(HC)^2 + mu_3*Age + mu_4*(Age > 23));  //too small right now.
 
 	/*Only choice in first period, is which school*/
 	if (Age == Age0) return !Alpha[][attend.pos] .* !Alpha[][work.pos] .* !Alpha[][savings.pos] .* !Alpha[][GrowUp.pos]
@@ -120,12 +129,14 @@ QualityConstraints::FeasibleActions(const Alpha) {
 	/*Do not choose school-type after first period*/
 	A = (Alpha[][schoice.pos].==0);
 
+//	A = 1; 
+
 	/*Cannot choose to grow up and attend school*/
 	A .*= 1 - (Alpha[][attend.pos]).*(Alpha[][GrowUp.pos]);
 // redundant??	A .*= 1 - (Alpha[][borrow.pos].>0).*(Alpha[][saving.pos].>0);
 
 	/*Cannot attend school if school type is 0*/
-	if (SchoolType.v == 0) A .*= (Alpha[][attend.pos].==0);  //this doesn't decrease total states, just shifts between columns
+	if (CV(SchoolType) == 0) A .*= (Alpha[][attend.pos].==0);  //this doesn't decrease total states, just shifts between columns
 	
 	if (curt > MaxTAtt)  {
 		A .*=  (Alpha[][attend.pos].==0);   /*rule out schooling if too old*/
@@ -133,7 +144,7 @@ QualityConstraints::FeasibleActions(const Alpha) {
 		}
 
 	/*If already GROWNUP, must choose GrowUp every period*/
-	if (GROWNUp.v == 1) {
+	if (CV(GROWNUp) == 1) {
 		A .*= (Alpha[][GrowUp.pos].==1); 
 		A .*= (Alpha[][attend.pos].==0);  	/*rule out school attendance when grownup = 0*/
 		A .*= (Alpha[][borrow.pos].==0);	/*would need to change if change grid points*/
@@ -146,17 +157,17 @@ QualityConstraints::FeasibleActions(const Alpha) {
 //	A.*= 1 - (asset.actual[asset.v] + savings.actual[savings.pos] .< B_Limit_Sav);
 
 	/*Old Age: No work choice, all full-time*/
-	if(curt == TMax-2) A.* (Alpha[][work.pos].==2); //work full-time only
+	if(curt >= TMax-2) A.* (Alpha[][work.pos].==2); //work full-time only
 
 	/*Need to rule out school borrowing while not attending*/
-	if(SchoolType.v != 0 && GROWNUp.v == 0) A.*= 1 - (Alpha[][attend.pos] == 0).*(Alpha[][borrow.pos] != 0);   //need to change if change gridpoints
+	if(CV(SchoolType) != 0 && CV(GROWNUp) == 0) A.*= 1 - (Alpha[][attend.pos] == 0).*(Alpha[][borrow.pos] != 0);   //need to change if change gridpoints
 
 	return A;
 	}  
 	 
 QualityConstraints::Reachable() {
 #ifdef RandomHumanCapital
-		decl MaxEarned = curt, Cr = Credits.v;
+		decl MaxEarned = curt, Cr = CV(Credits);
 
 		//inital decision
 		if (curt == TMax-1) return 0;  //never die
@@ -184,8 +195,8 @@ QualityConstraints::Reachable() {
 		//third phase
 		return new QualityConstraints();
 #else
-		decl MaxEarned = curt, MaxExp = curt, Cr = Credits.v, yrs_exp = (xper.v)/2;		
-		if (Credits.v > curt) return 0; 
+		decl MaxEarned = curt, MaxExp = curt, Cr = CV(Credits), yrs_exp = (xper.v)/2;		
+		if (CV(Credits) > curt) return 0; 
 		if (yrs_exp > curt) return 0;   		
 		return new QualityConstraints();
 #endif
@@ -206,7 +217,8 @@ QualityConstraints::HC_trans(FeasA) {
 		HC_nc =	AV(GROWNUp) == 0 ? beta_4*(AV(SchoolType)==1)*(FeasA[][attend.pos].==1) + beta_5*(AV(SchoolType)==2).*(FeasA[][attend.pos].==1) //Learning								  
 								 : beta_0 + beta_1*(FeasA[][work.pos].==0) + beta_2*(FeasA[][work.pos].==1) + beta_3*(FeasA[][work.pos].==2); //working
 		HC_down = 1 - HC_up - HC_nc;
-		return HC_up~HC_nc~HC_down;
+//		println("Human Capital", HC_up~HC_nc~HC_down~FeasA);
+		return HC_down~HC_nc~HC_up;
 	}
 	else{
 	 	return 0~1~0;
@@ -233,7 +245,7 @@ QualityConstraints::Budget(FeasA) {
 	if (curt==0) return 0;
 	
 	decl BA = 0, Age = Age0 + curt, sch_repayment;
-	decl stype = SchoolType.v, score = Score.v, schloans = Sch_loans.actual[Sch_loans.v];	//getting values 
+	decl stype = CV(SchoolType), score = CV(Score), schloans = Sch_loans.actual[CV(Sch_loans)];	//getting values 
 	decl att1 = FeasA[][attend.pos], wrk1 = FeasA[][work.pos], sav1 = FeasA[][borrow.pos];
 	decl wage_shock = wagesig*AV(wageoffer);
 
@@ -270,13 +282,15 @@ QualityConstraints::Budget(FeasA) {
 	}
 
 //**Transition of Credits**//
+
+//need to fix.
 QualityConstraints::Transit(FeasA){
 
-	if(GROWNUp.v == 0){
-		decl ivals_work = FeasA[][work.pos], ivals_attend = FeasA[][attend.pos];
-		decl pi_f = theta_1*CV(Abil) + theta_3*curt + theta_5*(ivals_work.==0) + (theta_5 + theta_6)*(ivals_work.<=.5) + (theta_5 + theta_6 + theta_7)*(ivals_work.==1); 
-		decl prob_fail = 1/(1+exp(pi_f)); 
-		return 0~(prob_fail)~(1-prob_fail); //stay the same, up 1, down 1
+	if(CV(GROWNUp) == 0){
+		decl ivals_work = FeasA[][work.pos], ivals_attend = FeasA[][attend.pos]; 
+		decl pi_f = theta_1*CV(Abil) + theta_3*curt + theta_5*(ivals_work.==0) + (theta_5 + theta_6)*(ivals_work.<=.5) + (theta_5 + theta_6 + theta_7)*(ivals_work.==1);
+		println("Credits",pi_f~(1-pi_f)~0);
+		return 0~(pi_f)~(1-pi_f);
 	}
 	else{
 		return 0~1~0; //No transition on credits when grownup. 

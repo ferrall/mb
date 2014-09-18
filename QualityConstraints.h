@@ -80,10 +80,11 @@ struct QualityConstraints : ExtremeValue	{	 //ExpostSmoothing just copied from K
 	mu_4 = .4159,
 
 	//credit passing/failing
-	theta_0 = <-4.00,1.00,-2.04,2.40>, //un observedtype 1, 2, 3, 4
-	theta_1 = 1.08,	//GPA (i'll make this ability)
+//	theta_0 = <-4.00,1.00,-2.04,2.40>, //un observedtype 1, 2, 3, 4
+	theta_0 = .25,
+	theta_1 = .25,	//GPA (i'll make this ability)
 	theta_2 = .0730,	//grade they are in
-	theta_3 = 2.99,	//age
+	theta_3 = .05,	//age
 	theta_4 = .00999,	//no credits
 	theta_5 = -.0697,	 //no work
 	theta_6 = -.136,	 //pt work
