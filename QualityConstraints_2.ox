@@ -28,7 +28,7 @@ SetDelta(0.95);
 	Emax -> Solve(0,0);
 	PD = new PanelPrediction(0);
 	PD -> Predict(22);
-	PD -> Histogram(work,TRUE,TRUE);
+	PD -> Histogram(HC,TRUE,TRUE);
 	delete PD;
 }
 
@@ -56,13 +56,23 @@ QualityConstraints_2::HC_trans(FeasA) {
 		HC_nc = beta_0 + beta_1*(FeasA[][work.pos].==0) + beta_2*(FeasA[][work.pos].==1) + beta_3*(FeasA[][work.pos].==2);
 		HC_down = 1 - HC_up - HC_nc;
 
+		if(HC.v == 0){
+//		println(HC_down~HC_nc~HC_up~HC_down+HC_nc+HC_up);
+		return HC_down+HC_nc~HC_up;
+		}
+		else if(HC.v == MaxHC){
+//		println(HC_down~HC_nc~HC_up~HC_down+HC_nc+HC_up);
+		return HC_down~HC_nc+HC_up;
+		}
+		else{
+//		println(HC_down~HC_nc~HC_up~HC_down+HC_nc+HC_up);
+		return HC_down~HC_nc~HC_up;
+		}
+
 //		println(HC_down~HC_nc~HC_up);
 //		return HC_down~HC_nc~HC_up;
 
 //	println(FeasA~zeros(rows(FeasA),1));
-
-//	println("HC",HC_down~HC_nc~HC_up, "Zeroes", zeros(rows(FeasA),1)~ones(rows(FeasA),1)~zeros(rows(FeasA),1));
-		return zeros(rows(FeasA),1)~ones(rows(FeasA),1)~zeros(rows(FeasA),1);
 	}
 	else{
 	 	return zeros(rows(FeasA),1)~ones(rows(FeasA),1)~zeros(rows(FeasA),1);
