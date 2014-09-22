@@ -2,7 +2,7 @@
 
 QualityConstraints_2::Replicate(){
 
-decl KW, PD, PS, vmat, expbirths, t;
+decl KW, PD;
 
 Initialize(1.0,Reachable, TRUE, 0);
 SetClock(UncertainLongevity,TMax,0.0);
@@ -10,19 +10,30 @@ SetDelta(0.95);
 
 /**Actions**/
 	Actions(
-		work = new ActionVariable("work", MWorklabel) );
+		work = new ActionVariable("work", MWorklabel),
+		savings = new ActionVariable("savings", MaxAssets));
 
 	work.actual = <0.0,0.5,1.0>;
+	savings.actual = <0.0, 1000.0, 5000.0, 10000.0, 20000.0>;
 
 /**State Variables:**/
 
 //ENDOGENOUS STATES:
 
 	EndogenousStates(
- 		HC = new RandomUpDown("HC", MaxHC, QualityConstraints_2::HC_trans));
+ 		HC = new RandomUpDown("HC", MaxHC, QualityConstraints_2::HC_trans),
+		asset = new Asset("asset", MaxAssets, r, QualityConstraints_2::Savings));
+
+	GroupVariables(Abil = new FixedEffect("abil", MAbillabel),
+			   	   Race = new FixedEffect("race", MRacelabel),
+			       Score = new FixedEffect("score", 1), 	//MScorelabel
+			       Wealth = new FixedEffect("wealth", 1),	//MWealthlabel
+			       Inc = new FixedEffect("income", 1), 		//MInclabel
+			       Nsib = new FixedEffect("nsib", 1)	//sibling in college or not. 
+			   	   );
 	
 	CreateSpaces();
-	Volume = NOISY;
+//	Volume = NOISY;
 	decl Emax = new ValueIteration(0);
 //	Emax.Volume = NOISY;
 	Emax -> Solve(0,0);
@@ -57,27 +68,25 @@ QualityConstraints_2::HC_trans(FeasA) {
 		HC_down = 1 - HC_up - HC_nc;
 
 		if(HC.v == 0){
-//		println(HC_down~HC_nc~HC_up~HC_down+HC_nc+HC_up);
-		return HC_down+HC_nc~HC_up;
+			return HC_down+HC_nc~HC_up;
+			println(HC_down+HC_nc~HC_up);
 		}
 		else if(HC.v == MaxHC){
-//		println(HC_down~HC_nc~HC_up~HC_down+HC_nc+HC_up);
-		return HC_down~HC_nc+HC_up;
+			return HC_down~HC_nc+HC_up;
 		}
 		else{
-//		println(HC_down~HC_nc~HC_up~HC_down+HC_nc+HC_up);
-		return HC_down~HC_nc~HC_up;
+			return HC_down~HC_nc~HC_up;
 		}
-
-//		println(HC_down~HC_nc~HC_up);
-//		return HC_down~HC_nc~HC_up;
-
-//	println(FeasA~zeros(rows(FeasA),1));
 	}
 	else{
 	 	return zeros(rows(FeasA),1)~ones(rows(FeasA),1)~zeros(rows(FeasA),1);
 	}
 }
+
+QualityConstraints_2::Savings(FeasA){
+	println(savings.actual[FeasA[][savings.pos]]'~FeasA);
+	return savings.actual[FeasA[][savings.pos]]';
+	}
 
 QualityConstraints_2::Utility() {
 
@@ -86,7 +95,7 @@ QualityConstraints_2::Utility() {
 	wage = ((omega_1) + (omega_2)*CV(HC))*52.*aa(work);
 				  
 
-	decl cons =	wage; /*Consumption*/
+	decl cons =	wage; // - savings.actual[aa(savings)]'; /*Consumption*/
 
 	/*Total one period utility*/
 	decl util = cons .<= 0.0 .? -.Inf .:  (cons.^(1-rho))/(1-rho) + aa(work)*gamma_22;
