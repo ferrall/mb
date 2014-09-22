@@ -59,32 +59,24 @@ QualityConstraints_2::Reachable() {
 }
 
 QualityConstraints_2::HC_trans(FeasA) {
-	decl HC_up, HC_nc, HC_down;
+     decl HC_up, HC_nc, HC_down;
 
-	if(curt<TMax-2){
+     if(curt<TMax-2){
+         HC_up = beta_0 + beta_1*(FeasA[][work.pos].==0) + beta_2*(FeasA[][work.pos].==1);
+         HC_nc = beta_0 + beta_1*(FeasA[][work.pos].==0) + beta_2*(FeasA[][work.pos].==1) + beta_3*(FeasA[][work.pos].==2);
+		 }
+     else {
+         HC_up = 0.0;
+         HC_nc = 1.0;
+         }
+     HC_down = 1 - HC_up - HC_nc;
 
-		HC_up = beta_0 + beta_1*(FeasA[][work.pos].==0) + beta_2*(FeasA[][work.pos].==1);
-		HC_nc = beta_0 + beta_1*(FeasA[][work.pos].==0) + beta_2*(FeasA[][work.pos].==1) + beta_3*(FeasA[][work.pos].==2);
-		HC_down = 1 - HC_up - HC_nc;
-
-		if(HC.v == 0){
-			return HC_down+HC_nc~HC_up;
-			println(HC_down+HC_nc~HC_up);
-		}
-		else if(HC.v == MaxHC){
-			return HC_down~HC_nc+HC_up;
-		}
-		else{
-			return HC_down~HC_nc~HC_up;
-		}
-	}
-	else{
-	 	return zeros(rows(FeasA),1)~ones(rows(FeasA),1)~zeros(rows(FeasA),1);
-	}
+	 decl vv = CV(HC.v),
+ 		q = (vv ?  HC_down ~ (vv < HC.N-1 ? HC_nc~HC_up : (HC_nc+HC_up)) : HC_down+HC_nc~HC_up);
+     return q;
 }
 
 QualityConstraints_2::Savings(FeasA){
-	println(savings.actual[FeasA[][savings.pos]]'~FeasA);
 	return savings.actual[FeasA[][savings.pos]]';
 	}
 
@@ -93,9 +85,8 @@ QualityConstraints_2::Utility() {
 	if (curt==TMax-1 || curt==0) return zeros(rows(A[Aind]),1);
 
 	wage = ((omega_1) + (omega_2)*CV(HC))*52.*aa(work);
-				  
 
-	decl cons =	wage; // - savings.actual[aa(savings)]'; /*Consumption*/
+	decl cons =	wage - savings.actual[aa(savings)]'; /*Consumption*/
 
 	/*Total one period utility*/
 	decl util = cons .<= 0.0 .? -.Inf .:  (cons.^(1-rho))/(1-rho) + aa(work)*gamma_22;
