@@ -171,7 +171,7 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 			Budget(FeasA);
 			Utility();
 	static	HC_trans(FeasA);
-	static	Transit(FeasA);
+	static	Cr_Transit(FeasA);
 	static  Degree_Status(FeasA);
 	static  Savings(FeasA);
 	static  Loans(FeasA);
