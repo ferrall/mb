@@ -1,4 +1,5 @@
 #include "QualityConstraints_2.h"
+#include "PermanentChoice_1.ox"
 
 QualityConstraints_2::Replicate(){
 
@@ -6,7 +7,7 @@ decl KW, PD;
 
 Initialize(1.0,Reachable, TRUE, 0);
 //SetClock(UncertainLongevity,TMax,0.0);
-SetClock(NormalAging,TMax-2);
+SetClock(NormalAging,TMax);
 SetDelta(0.95);
 
 /**Actions**/
@@ -14,11 +15,11 @@ SetDelta(0.95);
 		work = new ActionVariable("work", MWorklabel),
 		attend = new ActionVariable("attend", MAttendlabel), //attend school
 	 	GrowUp = new ActionVariable("GrowUp", MPhaselabel),
-		schoice = new ActionVariable("schoice", MSchooltype), //); //school choice; //,
-		savings = new ActionVariable("savings", MaxAssets));
+		schoice = new ActionVariable("schoice", MSchooltype)); //school choice;
+//		savings = new ActionVariable("savings", MaxAssets));
 
 	work.actual = <0.0,0.5,1.0>;
-	savings.actual = <0.0, 1000.0, 5000.0, 10000.0, 20000.0>;
+//	savings.actual = <0.0, 1000.0, 5000.0, 10000.0, 20000.0>;
 
 /**State Variables:**/
 
@@ -27,9 +28,10 @@ SetDelta(0.95);
 	EndogenousStates(
  		HC = new RandomUpDown("HC", MaxHC, QualityConstraints_2::HC_trans),
 		Credits= new RandomUpDown("Credits", MaxCredits, QualityConstraints_2::Transit),
-		GROWNUp = new LaggedAction("GROWNUp", GrowUp),
-		SchoolType = new PermanentChoice("SchoolType", schoice), //); //,
-		asset = new Asset("asset", MaxAssets, r, QualityConstraints_2::Savings));
+		GROWNUp = new PermanentChoice("GROWNUp", GrowUp),
+		SchoolType = new PermanentChoice_1("SchoolType", schoice, GROWNUp));
+//		SchoolType = new PermanentChoice("SchoolType", schoice)); //
+//		asset = new Asset("asset", MaxAssets, r, QualityConstraints_2::Savings));
 
 		ExogenousStates(
 //		leisure = new SimpleJump("g",3),
@@ -82,14 +84,23 @@ QualityConstraints_2::FeasibleActions(const Alpha) {
 		}
 //	else
 //		A .*= Alpha[][savings.pos].==0;	 /*Would need to change if i change the grid points for savings*/
-
-	if(curt == TMax-2) A.* (Alpha[][work.pos].==2); //work full-time only
+//
+	if(curt >= TMax-2) A.*= (Alpha[][work.pos].==2); //work full-time only
 
 	
 	return A;
 	}
 
+	//Sunday
 QualityConstraints_2::Reachable() {
+
+		decl MaxEarned = curt, Cr = Credits.v;
+//		if (!GROWNUp.v && asset.v!= 0 ) return 0; // no assets before growing up
+		if (Credits.v > curt*5) return 0;	 //Need to edit this once more than 1 credit a year
+//		if (curt == 0 && asset.v !=0) return 0; //anything other than assets = 0, not possible first period
+//		if (Credits.v > 0 && GROWNUp.v == 1) return 0;	//forget credits when grown-up.
+//		if (SchoolType.v > 0 && GROWNUp.v ==1) return 0; //forget school type one working age
+//		if (curt >= TMax-2 && Sch_loans.v > 0) return 0; //forget student loans once older worker
 
 		return new QualityConstraints_2();
 }
@@ -133,11 +144,12 @@ QualityConstraints_2::Transit(FeasA){
 	return v;	
 
 } 
-
+  /*
 QualityConstraints_2::Savings(FeasA){
+	//println
 	return savings.actual[FeasA[][savings.pos]]';
 	}
- 
+*/ 
 
 //**Transition of Credits**//
 
@@ -145,7 +157,12 @@ QualityConstraints_2::Utility() {
 
 	if (curt==TMax-1 || curt==0) return zeros(rows(A[Aind]),1);
 
-	wage = ((omega_1) + (omega_2)*CV(HC))*52.*aa(work);
+	wage = ((omega_1) + (omega_2)*CV(HC))*52 .*(work.actual[aa(work)]');
+//	wage = ((omega_1) + (omega_2)*CV(HC))*52 .*aa(work);
+
+//	decl wage_1 = ((omega_1) + (omega_2)*CV(HC))*52 .*(work.actual[aa(work)]');
+
+//	println(wage~wage_1);
 
 	decl cons =	wage; // - savings.actual[aa(savings)]'; /*Consumption*/
 
