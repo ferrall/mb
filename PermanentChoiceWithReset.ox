@@ -11,6 +11,7 @@ PermanentChoiceWithReset :: PermanentChoiceWithReset(L, Target, Reset)  {
     }
 
 PermanentChoiceWithReset :: Transit(FeasA) {
+        t.v = v;   // synchronize base variable value
 	decl v = FeasA[][Reset.pos].!=0, t = PermanentChoice::Transit(FeasA);
 	if (any(v)) {                       //reset is feasible
 		if (any(t[Qi]==0))          //some regular transitions are 0, replace prob.
