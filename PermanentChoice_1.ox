@@ -6,10 +6,10 @@ struct PermanentChoice_1 : PermanentChoice {
      }
 
 PermanentChoice_1 :: PermanentChoice_1(const L, const Target, const Reset)  {
-	PermanentChoice_1(L, Target);	
+	PermanentChoice(L, Target);	
 	this.Reset = Reset;
     }
 
 PermanentChoice_1 :: Transit(const FeasA) {
-	return CV(Reset) ? return{<0>,ones(rows(FeasA),1)} : PermanentChoice::Transit(FeasA);
+	return CV(Reset) ? {<0>,ones(rows(FeasA),1)} : PermanentChoice::Transit(FeasA);
 	}

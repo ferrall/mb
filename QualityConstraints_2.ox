@@ -6,7 +6,7 @@ QualityConstraints_2::Replicate(){
 
 decl KW, PD, PS;
 
-Initialize(1.0,Reachable, TRUE, 0);
+Initialize(1.0,Reachable, TRUE, 0);			//For experiment
 //SetClock(UncertainLongevity,TMax,0.0);
 SetClock(NormalAging,TMax);
 SetDelta(0.95);

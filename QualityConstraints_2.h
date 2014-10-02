@@ -2,7 +2,7 @@
 
 struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from KW
 
-	decl InSubSample;
+	decl InSubSample;  //sample
 		
 	//**Labels for school choices. @name Choices **/
 	  enum{Noschool, ElitePrivate, Private, ElitePublic, Public, MSchooltype}
