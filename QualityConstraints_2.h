@@ -5,7 +5,7 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 	decl InSubSample;  //sample
 		
 	//**Labels for school choices. @name Choices **/
-	  enum{Noschool, ElitePrivate, Private, ElitePublic, Public, MSchooltype}
+	  enum{Noschool, ElitePrivate, Private, ElitePublic, Public, Forgotten, MSchooltype}
 
 	//**Labels for attendance choices. @name Choices **/
 	  enum{NoAttend, Attend, MAttendlabel}
@@ -34,7 +34,7 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 	 enum{gen,spec,Ngrants}	
 	
 	/** State Space Dimensions. @name Dimens **/
-	enum{Age0 = 18, MaxXper=5, MaxCredits=5, MaxTAtt = 10, MaxAssets = 5, MaxScAssets = 3, MaxYrsWrk = 10, TMax=2+MaxTAtt+MaxYrsWrk,Noffers = 3, MaxHC = 5}
+	enum{Age0 = 18, MaxXper=5, MaxCredits=5, MaxTAtt = 8, MaxAssets = 5, MaxScAssets = 3, MaxYrsWrk = 5, TMax=2+MaxTAtt+MaxYrsWrk,Noffers = 3, MaxHC = 5}
 	
 	static const decl
 //		leisuresig = 201.3,
