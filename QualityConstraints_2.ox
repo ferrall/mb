@@ -14,8 +14,9 @@ SetDelta(0.95);
 /**Actions**/
 	Actions(
 		schoice = new ActionVariable("schoice", MSchooltype), //school choice;
-//		attend = new ActionVariable("attend", MAttendlabel), //attend school
+		attend = new ActionVariable("attend", MAttendlabel), //attend school
 		work = new ActionVariable("work", MWorklabel),
+		savings = new ActionVariable("savings", MaxAssets),
 	 	GrowUp = new ActionVariable("GrowUp", MPhaselabel)); //,
 
 	work.actual = <0.0,0.5,1.0>;
@@ -25,22 +26,22 @@ SetDelta(0.95);
 //ENDOGENOUS STATES:
 
 	EndogenousStates(
-//		Credits= new RandomUpDown("Credits", MaxCredits, QualityConstraints_2::Cr_Transit),
 		GROWNUp = new PermanentChoice("GROWNUp", GrowUp),		
+		Credits=  new Forget(new RandomUpDown("Credits", MaxCredits, QualityConstraints_2::Cr_Transit),GROWNUp,Forgotten),
 		SchoolType = new Forget(new PermanentChoice("SchoolType", schoice)
 					,GROWNUp,Forgotten),
+		asset = new Asset("asset", MaxAssets, r, QualityConstraints_2::Savings), 
  		HC = new RandomUpDown("HC", MaxHC, QualityConstraints_2::HC_trans)
 					);
-	Volume = LOUD;	
 	CreateSpaces();
 	decl Emax = new ValueIteration();
-	Emax.Volume = LOUD;
 	Emax -> Solve();
 	PD = new PanelPrediction(0);
-	Prediction::Volume = NOISY;
-	PD -> Predict(5);
+	PD -> Predict(TMax);
 	PD -> Histogram(HC,TRUE,TRUE);
-//	PD -> Histogram(GrowUp,TRUE,TRUE);
+	PD -> Histogram(GrowUp,TRUE,TRUE);
+	PD -> Histogram(Credits,TRUE,TRUE);
+	PD -> Histogram(attend,TRUE,TRUE);	
 //	PD -> Histogram(GROWNUp,TRUE,TRUE);
 	delete PD;
 }
@@ -55,25 +56,20 @@ QualityConstraints_2::FeasibleActions(const Alpha) {
 				(Alpha[][schoice.pos].==Forgotten) );
 
 	A = !( CV(GROWNUp) + Alpha[][schoice.pos] )            //After t=0, no choice
-		+ CV(GROWNUp).*(Alpha[][schoice.pos].==Forgotten); //After GROWNUp, no choice, but forgotten state
+		+ CV(GROWNUp).*(Alpha[][schoice.pos].==Forgotten|| !Alpha[][attend.pos]); //After GROWNUp, no choice, but forgotten state
 
 	if (curt >= MaxTAtt) 
 			A .*= (Alpha[][GrowUp.pos]);  	/*Must grow up at certain age*/
-	 else if (curt!= 3 || CV(HC)==1 || CV(SchoolType)==1 ) 
-		 	A .*= !(Alpha[][GrowUp.pos]);  // can only  grow up at t=3, HC=1
-//	if (curt >= MaxTAtt || CV(GROWNUp) ) {
-//		A .*= (Alpha[][GrowUp.pos]);  	/*Must grow up at certain age*/
-//		}
+	 else 
+		 	A .*= !(Alpha[][GrowUp.pos]); 
 
-	if (curt >= TMax-2) A.*= (Alpha[][work.pos].==FullWork); //work full-time only
+//	if (curt >= TMax-2) A.*= (Alpha[][work.pos].==FullWork); //work full-time only
 	
 	return A;
 	}
 
 QualityConstraints_2::Reachable() {
-	if(curt > MaxTAtt && !CV(GROWNUp) ) return 0;
-//		//PermanentChoiceWithReset will not work if below is commented out. Not sure why.
-	if ( (curt > MaxTAtt || CV(GROWNUp) ) && (CV(SchoolType)!=Forgotten) ) return 0; 
+	if ( (curt > MaxTAtt || CV(GROWNUp) ) && ( CV(SchoolType)!=Forgotten || CV(Credits)!=Forgotten ) ) return 0; 
 	return new QualityConstraints_2();
 	}
 
@@ -85,8 +81,6 @@ QualityConstraints_2::HC_trans(FeasA) {
     HC_nc = beta_0 + beta_1*(FeasA[][work.pos].==0) + beta_2*(FeasA[][work.pos].==1) + beta_3*(FeasA[][work.pos].==2);
     HC_down = 1 - HC_up - HC_nc;
 	if (any(HC_down~HC_nc~HC_up .< 0)) oxrunerror("HC probs. invalid");
-//	 decl vv = CV(HC.v),
-// 		q = (vv ?  HC_down ~ (vv < HC.N-1 ? HC_nc~HC_up : (HC_nc+HC_up)) : (HC_down+HC_nc)~HC_up);
      return HC_down~HC_nc~HC_up;
 }
 
@@ -98,7 +92,7 @@ QualityConstraints_2::Cr_Transit(FeasA){
 
 	decl Age = curt + Age0;
 	
-  	if(CV(GROWNUp) == 0){
+  	if(!CV(GROWNUp)){
 		decl ivals_work = FeasA[][work.pos], ivals_attend = FeasA[][attend.pos]; 
 	    prob_pass = ivals_attend .? (theta_0 + theta_1*CV(Abil) + theta_5*(ivals_work.==0) + theta_6*(ivals_work.==.5) + theta_7*(ivals_work.==1)) .: 0;
 		 }
@@ -111,12 +105,12 @@ QualityConstraints_2::Cr_Transit(FeasA){
 	return prob_down ~ prob_fail ~ prob_pass;
 }
 
-  /*
+ 
 QualityConstraints_2::Savings(FeasA){
 	//println
 	return savings.actual[FeasA[][savings.pos]]';
 	}
-*/ 
+ 
 
 QualityConstraints_2::Utility() {
 
