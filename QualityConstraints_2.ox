@@ -126,4 +126,15 @@ QualityConstraints_2::Utility() {
 
 	return util;
 	}
+
+	//age, fixed effects condition on those to get moments ->
+	//wage, wage^2
+
+	//1 ) data files for niqlow
+
+	//auxillary
+
+	//compute in panel correlation between th momemnts  or contemporaneous
+
+	// 2) data set for calculating moments 
 	
