@@ -19,7 +19,9 @@ SetDelta(0.95);
 		savings = new ActionVariable("savings", MaxAssets),
 	 	GrowUp = new ActionVariable("GrowUp", MPhaselabel)); //,
 
-	work.actual = <0.0,0.5,1.0>;
+	work.actual = <0.0;0.5;1.0>;
+//	borrow.actual = <0.0, 3000.0, 6000.0 >;
+	savings.actual = <0.0; 1000.0; 5000.0; 10000.0; 20000.0>;
 
 /**State Variables:**/
 
@@ -33,6 +35,8 @@ SetDelta(0.95);
 		asset = new Asset("asset", MaxAssets, r, QualityConstraints_2::Savings), 
  		HC = new RandomUpDown("HC", MaxHC, QualityConstraints_2::HC_trans)
 					);
+	asset.actual = savings.actual;
+	Volume = LOUD;
 	CreateSpaces();
 	decl Emax = new ValueIteration();
 	Emax -> Solve();
@@ -108,7 +112,7 @@ QualityConstraints_2::Cr_Transit(FeasA){
  
 QualityConstraints_2::Savings(FeasA){
 	//println
-	return savings.actual[FeasA[][savings.pos]]';
+	return savings.actual[FeasA[][savings.pos]];
 	}
  
 
