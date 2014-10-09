@@ -35,17 +35,20 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 	//**Labels for Phases**//
 	  enum{SchAge, WrkAge, MPhaselabel}
 
+	 //**Labels for GrowUp**//
+	 enum{Young, Older, MGrowUplabel}
+
 	 enum{gen,spec,Ngrants}	
 	
 	/** State Space Dimensions. @name Dimens **/
-	enum{Age0 = 18, MaxXper=5, MaxCredits=5, MaxTAtt = 10, MaxAssets = 5, MaxScAssets = 3, MaxYrsWrk = 10, TMax=2+MaxTAtt+MaxYrsWrk,Noffers = 3, MaxHC = 5}
+	enum{Age0 = 18, MaxCredits=5, MaxTAtt = 10, MaxAssets = 5, MaxScAssets = 3, MaxYrsWrk = 10, TMax=2+MaxTAtt+MaxYrsWrk,Noffers = 3, MaxHC = 5}
 	
 	static const decl
-//		leisuresig = 201.3,
-//		attsig = 2599.0,
+	//	leisuresig = 201.3,
+	//	attsig = 2599.0,
 		wagesig = 1.0,
 		
-	sig = <498; 0; 6796>, //shock 1: work, shock 2: college attendance, 3: wage
+	sig = <498, 0, 6796>, //shock 1: work, shock 2: college attendance, 3: wage
 
 	//Risk aversion
 	rho = 2, //literature
@@ -66,16 +69,6 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 	gamma_22 = <4.927>, //prefences for working full-time shifter
 	gamma_25 = <2.164, -.6864>, //age and full-time, part-time interactions
 
-	//HC function:
-	phi_0 = 2.485, //constant
-	phi_1 = <.0145, 0.0168>, //years at 2-year/ 4-year
-	phi_3 = .1905, //BA completion
-	phi_4 = .0685, //years of experience
-	phi_5 = -.0032, //years of experience squared
-	phi_6 = .00025,	 //ability (but mine is tercile, his is level)
-	phi_7 = -.0709, //type 2
-	phi_8 = -.2264,	 //type 3.
-
 	//Asset lower limit
 	mu_0 = .5523,
 	mu_1 = .0984,
@@ -95,6 +88,8 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 	theta_7 = -.22,	 //ft work
 
 	//Random HC function
+
+	//work
 	beta_0 = .19,
 	beta_1 = .05,
 	beta_2 = .07,
@@ -103,6 +98,14 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 	beta_5 = .10,
 	beta_6 = .20,
 	beta_7 = .40,
+
+	//school
+	phi_0 = .10,
+	phi_1 = .15,
+	phi_2 = .2,
+	phi_3 = .24,
+	phi_4 = .15,
+	
 	//Wage equation function
 
 	//minimum earnings
@@ -142,7 +145,6 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 											Sch_loans,
 											BA,										
 											GrowUp,
-//											OldWorker,
 		/** school choice **/   			schoice,
 		/**work**/							work,
 		/**credits earned**/				Credits,

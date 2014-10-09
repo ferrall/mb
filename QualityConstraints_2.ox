@@ -34,20 +34,21 @@ SetDelta(0.95);
 		SchoolType = new Forget(new PermanentChoice("SchoolType", schoice)
 					,GROWNUp,Forgotten),
 		asset = new Asset("asset", MaxAssets, r, QualityConstraints_2::Savings),
+	//	Sch_loans = new Forget(new Asset("Sch_loans", MaxScAssets, r1, QualityConstraints_2::Loans),
+	//				Event(), Forgotten),
 		Sch_loans = new Asset("Sch_loans", MaxScAssets, r1, QualityConstraints_2::Loans),
 		HC = new Freeze(new RandomUpDown("HC", MaxHC, QualityConstraints_2::HC_trans), QualityConstraints_2::Event())		   //Event needs to be an age. 
-// 		HC = new RandomUpDown("HC", MaxHC, QualityConstraints_2::HC_trans)
 					);
 	asset.actual = savings.actual;
 
 //EXOGENOUS STATES:
- /*
+ 
 	ExogenousStates(
-		leisure = new SimpleJump("g",3),
-		wageoffer = new Zvariable("w",Noffers) //,
+	//	leisure = new SimpleJump("g",3),
+		wageoffer = new Zvariable("w",Noffers),
 		gshocks = new MVNormal("eps", Ngrants, Noffers, zeros(Ngrants,1),sig)
 		);
- */
+ 
  
 //Fixed Effects:
 	GroupVariables(
@@ -78,16 +79,16 @@ SetDelta(0.95);
 
 /**CONSTRAINTS ON CHOICE:**/
 QualityConstraints_2::FeasibleActions(const Alpha) {
+
+//there is a mistake here, in some phase you cannot attend, but you can borrow
 	
 	decl Age = curt + Age0, A;
 
 	//Need to clean up below: Basically -> if school choice is 0, you have to grow up in the initial period. 
 	if (Age == Age0) return (!Alpha[][attend.pos] .* !Alpha[][work.pos] .* !Alpha[][savings.pos].* !Alpha[][borrow.pos])
-							.*!(Alpha[][GrowUp.pos].*Alpha[][schoice.pos]).*(1 - (!Alpha[][GrowUp.pos].*!Alpha[][schoice.pos]));;
+							.*!(Alpha[][GrowUp.pos].*Alpha[][schoice.pos]).*(1 - (!Alpha[][GrowUp.pos].*!Alpha[][schoice.pos]));
 
 	A = (Alpha[][schoice.pos].==0);
-
-	if (CV(SchoolType) == 0) A .*= (Alpha[][attend.pos].==NoAttend); 
 
 //	A = !( CV(GROWNUp) + Alpha[][schoice.pos] )            //After t=0, no choice
 //		+ CV(GROWNUp).*(Alpha[][schoice.pos].==Forgotten|| !Alpha[][attend.pos]); //After GROWNUp, no choice, but forgotten state
@@ -95,13 +96,14 @@ QualityConstraints_2::FeasibleActions(const Alpha) {
 	if (curt >= MaxTAtt) A .*= (Alpha[][GrowUp.pos]);  	/*Must grow up at certain age*/
 
 	if (CV(GROWNUp) == 1) {
-		A .*= (Alpha[][GrowUp.pos].==1); 
+		A .*= (Alpha[][GrowUp.pos].==Older); 
 		A .*= (Alpha[][attend.pos].==NoAttend);  	/*rule out school attendance when grownup = 0*/
 		A .*= (Alpha[][borrow.pos].==0);	/*would need to change if change grid points*/
 		}
-	else
-		A .*= Alpha[][savings.pos].==0;	 /*Would need to change if i change the grid points for savings*/
-
+	else{
+		A .*= (Alpha[][savings.pos].==0);	 /*Would need to change if i change the grid points for savings*/
+		A .*= 1 - (!Alpha[][attend.pos]).*!(!Alpha[][borrow.pos]);
+		}
 
 //	if (curt >= TMax-2) A.*= (Alpha[][work.pos].==FullWork); //work full-time only
 	
@@ -137,8 +139,14 @@ QualityConstraints_2::HC_trans(FeasA) {
      decl HC_up, HC_nc, HC_down;
 
 //     Now RandomUpDown always takes 3 prob.
+	if(!GROWNUp.v){
+    HC_up = (FeasA[][attend.pos].==1).*(phi_0 + phi_1*(SchoolType.v==1) + phi_2*(SchoolType.v==2) + phi_3*(SchoolType.v==3) + phi_4*(SchoolType.v==4));
+    HC_nc = phi_0 + phi_1*(SchoolType.v==1) + phi_2*(SchoolType.v==2);																										   
+	}
+	else{
     HC_up = beta_0 + beta_1*(FeasA[][work.pos].==0) + beta_2*(FeasA[][work.pos].==1);
-    HC_nc = beta_0 + beta_1*(FeasA[][work.pos].==0) + beta_2*(FeasA[][work.pos].==1) + beta_3*(FeasA[][work.pos].==2);
+    HC_nc = beta_0 + beta_1*(FeasA[][work.pos].==0) + beta_2*(FeasA[][work.pos].==1) + beta_3*(FeasA[][work.pos].==2);	
+	}
     HC_down = 1 - HC_up - HC_nc;
 	if (any(HC_down~HC_nc~HC_up .< 0)) oxrunerror("HC probs. invalid");
      return HC_down~HC_nc~HC_up;
@@ -178,12 +186,12 @@ QualityConstraints_2::Budget(FeasA) {
 	decl BA = 0, Age = Age0 + curt, sch_repayment;
 	decl stype = CV(SchoolType), score = CV(Score), schloans = Sch_loans.actual[CV(Sch_loans)];	//getting values 
 	decl att1 = FeasA[][attend.pos], wrk1 = FeasA[][work.pos], sav1 = FeasA[][borrow.pos];
-	decl wage_shock = wagesig*AV(wageoffer);
+//	decl wage_shock = wagesig*AV(wageoffer);
 
 	 /*Wages*/
 	wage = (wrk1.==0) .? ((omega_1) + (omega_2)*CV(HC))*52
-	                  .: (CV(HC)*exp(alpha_0+alpha_1*(wrk1.==1) + alpha_2*att1 + alpha_3*CV(Race) + wage_shock))*hours*weeks.*AV(wrk1)/2; //yearly wages too high right now
-					  
+	          //        .: (CV(HC)*exp(alpha_0+alpha_1*(wrk1.==1) + alpha_2*att1 + alpha_3*CV(Race) + wage_shock))*hours*weeks.*AV(wrk1)/2; //yearly wages too high right now
+					  .: (CV(HC)*exp(alpha_0+alpha_1*(wrk1.==1) + alpha_2*att1 + alpha_3*CV(Race)))*hours*weeks.*AV(wrk1)/2; 
 	/*Parental Transfers*/
 	transfers = (curt>=TMax-2) ? 0 : chi_0 + chi_1*att1 + chi_2*att1*CV(Wealth) + chi_3*(CV(Credits) + 12) + chi_4*Age + chi_7*CV(HC) + chi_8*CV(Race) + chi_10*AV(wrk1);
 	gross = AV(asset) + wage + transfers;
@@ -219,20 +227,20 @@ QualityConstraints_2::Savings(FeasA){
 	}
 
 QualityConstraints_2::Event() {
-	return curt >= TMax-2;
+	return (curt >= TMax-2);
 	}
-
-QualityConstraints_2::Utility() {
+	
+	QualityConstraints_2::Utility() {
 
 	if (curt==TMax-1 || curt==0) return zeros(rows(A[Aind]),1);
 
-//	wage = ((omega_1) + (omega_2)*CV(HC))*52 .*(work.actual[aa(work)]);
-	wage = ((omega_1) + (omega_2))*52 .*(work.actual[aa(work)]);
- 
-	decl cons =	wage; // - savings.actual[aa(savings)]'; /*Consumption*/
+	decl cons =	/*Consumption*/
+		//gross - net_tuition - n_loans - savings.actual[aa(savings)]' + borrow.actual[aa(borrow)]'; //not right?
+		//net-savings is state-and action-dependent change in asset holding:
+		wage + transfers - net_tuition - n_loans - savings.actual[aa(savings)]' + borrow.actual[aa(borrow)]'; //is this right?
 
 	/*Total one period utility*/
-	decl util = cons .<= 0.0 .? -.Inf .:  (cons.^(1-rho))/(1-rho) + aa(work)*gamma_22;
+	decl util = cons .<= 0.0 .? -.Inf .:  (cons.^(1-rho))/(1-rho) + aa(attend)*gamma_20 + aa(work)*gamma_22;
 
 	return util;
 	}
