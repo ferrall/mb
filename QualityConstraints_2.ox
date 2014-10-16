@@ -31,8 +31,7 @@ SetDelta(0.95);
 	EndogenousStates(
 		GROWNUp = new PermanentChoice("GROWNUp", GrowUp),		
 		Credits=  new Forget(new RandomUpDown("Credits", MaxCredits, QualityConstraints_2::Cr_Transit),GROWNUp,Forgotten),
-		SchoolType = new Forget(new PermanentChoice("SchoolType", schoice)
-					,GROWNUp,Forgotten),
+		SchoolType = new Forget(new PermanentChoice("SchoolType", schoice),GROWNUp,Forgotten),
 		asset = new Asset("asset", MaxAssets, r, QualityConstraints_2::Savings),
 	//	Sch_loans = new Forget(new Asset("Sch_loans", MaxScAssets, r1, QualityConstraints_2::Loans),
 	//				Event(), Forgotten),
@@ -186,12 +185,12 @@ QualityConstraints_2::Budget(FeasA) {
 	decl BA = 0, Age = Age0 + curt, sch_repayment;
 	decl stype = CV(SchoolType), score = CV(Score), schloans = Sch_loans.actual[CV(Sch_loans)];	//getting values 
 	decl att1 = FeasA[][attend.pos], wrk1 = FeasA[][work.pos], sav1 = FeasA[][borrow.pos];
-//	decl wage_shock = wagesig*AV(wageoffer);
+	decl wage_shock = wagesig*AV(wageoffer);
 
 	 /*Wages*/
 	wage = (wrk1.==0) .? ((omega_1) + (omega_2)*CV(HC))*52
-	          //        .: (CV(HC)*exp(alpha_0+alpha_1*(wrk1.==1) + alpha_2*att1 + alpha_3*CV(Race) + wage_shock))*hours*weeks.*AV(wrk1)/2; //yearly wages too high right now
-					  .: (CV(HC)*exp(alpha_0+alpha_1*(wrk1.==1) + alpha_2*att1 + alpha_3*CV(Race)))*hours*weeks.*AV(wrk1)/2; 
+	                  .: (CV(HC)*exp(alpha_0+alpha_1*(wrk1.==1) + alpha_2*att1 + alpha_3*CV(Race) + wage_shock))*hours*weeks.*AV(wrk1)/2; //yearly wages too high right now
+		//			  .: (CV(HC)*exp(alpha_0+alpha_1*(wrk1.==1) + alpha_2*att1 + alpha_3*CV(Race)))*hours*weeks.*AV(wrk1)/2; 
 	/*Parental Transfers*/
 	transfers = (curt>=TMax-2) ? 0 : chi_0 + chi_1*att1 + chi_2*att1*CV(Wealth) + chi_3*(CV(Credits) + 12) + chi_4*Age + chi_7*CV(HC) + chi_8*CV(Race) + chi_10*AV(wrk1);
 	gross = AV(asset) + wage + transfers;
@@ -222,7 +221,6 @@ QualityConstraints_2::Budget(FeasA) {
 
  
 QualityConstraints_2::Savings(FeasA){
-	//println
 	return savings.actual[FeasA[][savings.pos]];
 	}
 
