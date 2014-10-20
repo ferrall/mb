@@ -1,6 +1,4 @@
 #include "QualityConstraints_2.h"
-#include "PermanentChoiceWithReset.ox"
-#include "PermanentChoice_1.ox"
 
 QualityConstraints_2::Replicate(){
 
@@ -76,6 +74,19 @@ SetDelta(0.95);
 	delete PD;
 }
 
+/** Read in the data.**/
+
+CollegeData::CollegeData(method) {
+	DataSet("Quality",method,FALSE);
+//	Observed(QualityConstraints_2::Sch_loans,"Sch_loans",QualityConstraints_2::Race,"Race", QualityConstraints_2::attend, "attend",
+//			 QualityConstraints_2::nsib, "Nsib", QualityConstraints_2::work, "wrk");
+	Observed(UseLabel);
+	IDColumn("ID_97");
+	Read("QualityConstraints.dta");	
+	}
+  
+
+  
 /**CONSTRAINTS ON CHOICE:**/
 QualityConstraints_2::FeasibleActions(const Alpha) {
 

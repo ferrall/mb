@@ -1,8 +1,10 @@
 #import "DDP"
+#import "FiveO"
 
 struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from KW
 
 	decl InSubSample;  //sample
+	
 		
 	//**Labels for school choices. @name Choices **/
 	  enum{Noschool, ElitePrivate, Private, ElitePublic, Public, MSchooltype}
@@ -132,7 +134,7 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 	chi_10 = .4932,
 	
 	//Tuition & Grants
-	tau_0 = <0, 27530, 16891, 5090, 10540>,  //tuition
+	tau_0 = <0, 27530, 17296, 14435, 10215>,  //tuition
 	tau = <-6097, 921.6, -34.7, -4.4, 2234.4, 4366.2, 944.6, 4123.0, 0.0, 0.0, 0.0 ;   //General: Cons, black, income/1000, family assets/1000, SAT_2, SAT_3, Sib, 4 year.
            -12641, 6774.1, -71.6, -5.9, 3747.9, 7352.0, 2958.2, 12169.7, 15130.8, -11764.6, -4281.5>; //Specific: Cons, black, income/1000, assets/1000, SAT_2, SAT_3, Sibs, SAT_2private, SAT_3Private, priv_elite, 2-year
 //	tau_1 = <-6097, 921.6, -34.7, -4.4, 2234.4, 4366.2, 944.6, 4123.0>,	 //General: Cons, black, income/1000, family assets/1000, SAT_2, SAT_3, Sib, 4 year.
@@ -184,4 +186,8 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 	static	Event();
 	 	   	FeasibleActions(const Alpha); 
 	}
+
+	struct CollegeData : DataSet {
+	CollegeData(method=0);
+	}	
 
