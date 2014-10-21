@@ -55,6 +55,10 @@ SetDelta(0.95);
 		Nsib = new FixedEffect("nsib", 1)	//sibling in college or not. 
 			   );
 
+		AuxiliaryOutcomes(
+		 wage =  new AuxilaryVariable("wage")
+		);
+  
 			   
 //	Volume = LOUD;
 	CreateSpaces();
@@ -72,17 +76,17 @@ SetDelta(0.95);
 	delete PD;
 }
 
+//QualityConstraints_2::AuxiliaryOutcomes(wage)
+
 /** Read in the data.**/
 
 CollegeData::CollegeData(method) {
 	DataSet("Quality",method,FALSE);
-//	Observed(QualityConstraints_2::Sch_loans,"Sch_loans",QualityConstraints_2::Race,"Race", QualityConstraints_2::attend, "attend",
-//			 QualityConstraints_2::nsib, "Nsib", QualityConstraints_2::work, "wrk");
 	Observed(UseLabel);
+//	AuxiliaryOutcomes(wage);
 	IDColumn("ID_97");
 	Read("QualityConstraints.dta");	
 	}
-  
 
   
 /**CONSTRAINTS ON CHOICE:**/

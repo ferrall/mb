@@ -169,7 +169,7 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 											xpt;
 
 			decl							gross,
-											wage,
+					//						wage,
 											transfers,
 											net_tuition,
 											n_loans;
@@ -184,6 +184,7 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 	static  Savings(FeasA);
 	static  Loans(FeasA);
 	static	Event();
+	static  wage(FeasA);
 	 	   	FeasibleActions(const Alpha); 
 	}
 
