@@ -31,8 +31,6 @@ SetDelta(0.95);
 		Credits=  new Forget(new RandomUpDown("Credits", MaxCredits, QualityConstraints_2::Cr_Transit),GROWNUp,Forgotten),
 		SchoolType = new Forget(new PermanentChoice("SchoolType", schoice),GROWNUp,Forgotten),
 		asset = new Asset("asset", MaxAssets, r, QualityConstraints_2::Savings),
-	//	Sch_loans = new Forget(new Asset("Sch_loans", MaxScAssets, r1, QualityConstraints_2::Loans),
-	//				Event(), Forgotten),
 		Sch_loans = new Asset("Sch_loans", MaxScAssets, r1, QualityConstraints_2::Loans),
 		HC = new Freeze(new RandomUpDown("HC", MaxHC, QualityConstraints_2::HC_trans), QualityConstraints_2::Event())		   //Event needs to be an age. 
 					);
