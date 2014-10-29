@@ -43,14 +43,33 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 	 enum{gen,spec,Ngrants}	
 	
 	/** State Space Dimensions. @name Dimens **/
-	enum{Age0 = 18, MaxCredits=5, MaxTAtt = 10, MaxAssets = 5, MaxScAssets = 3, MaxYrsWrk = 10, TMax=2+MaxTAtt+MaxYrsWrk,Noffers = 3, MaxHC = 5}
-	
+	enum{Age0 = 18, MaxCredits=5, MaxTAtt = 10, MaxAssets = 5, MaxScAssets = 3, MaxYrsWrk = 10, TMax=2+MaxTAtt+MaxYrsWrk,Noffers = 3, MaxHC = 3}
+
+	enum{iborrow, isaving, isub, iunsub, MIntLabels}
+	enum{SchUtilType1, SchUtilType2, SchUtilType3, MSchUtilLabels}	  //School Utility - Gamma
+	enum{WrkUtilFullTime, WrkUtilType_1, WrkUtilType_2, WrkUtilType_3, WrkUtilAge, MWrkUtilLabels}		//Work Utility - Gamma_1
+	enum{CrPassInter, CrPassAbil, CrPassAge, CrPassPT, CrPassFT, MCreditLabels}	 //Credit passing - Theta
+	enum{MinEarnInt, MinEarnHC, MinEarnLabels} //minimum earnings - Omega
+	enum{WageInt, WageFT, WagePT, WageAbil, WageHC, WageAtt, WageType1, WageType2, WageType3, MWageLabels} 	//wages - Omega_1
+	enum{SchHCInt, SchAbil, SchHCType1, SchHCType2, SchHCType3, SchHCType4, MSchHCLabels} //HC School (up) - Phi
+	enum{WrkHCInt, WrkHCFT, WrkHCPT, WrkHCSType, WrkHCType1, WrkHCType2, WrkHCType3, MWrkHCLabels} //HC Wrk (up) - Phi_1
+	enum{SchHCNCInt, SchNCAbil, SchHCNCType1, SchHCNCType2, SchHCNCType3, SchHCNCType4, MSchNCHCLabels} //HC School (No change) - Phi_3
+	enum{WrkHCNCInt, WrkHCNCFT, WrkHCNCPT, WrkHCSNCType, WrkHCNCType1, WrkHCNCType2, WrkHCNCType3, MWrkNCHCLabels} //HC Wrk (No change) - Phi_4
+	enum{PrTrnsInt, PrTrnsParInc, PrTrnsParW, PrTrnsAtt, MPrTrnsLabels}	//Prob Parental Transfer - beta
+	enum{AmTrnsInt, AmTrnsParInc, AmTrnsParW, AmTrnsAtt, MAmTrnsLabels}	//Amount Parental Transfer - beta_1
+//	enum{  ,MShocksLabel}
+
+//Need Grants
+
 	static const decl
 	//	leisuresig = 201.3,
 	//	attsig = 2599.0,
 		wagesig = 1.0,
 		
 	sig = <498, 0, 6796>, //shock 1: work, shock 2: college attendance, 3: wage
+
+	par = <0.05, 0.05, 0.0, 0.07>,
+  
 
 	//Risk aversion
 	rho = 2, //literature
@@ -60,87 +79,21 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 	hours = 30, //equivalent full-time hours.
 	weeks = 45, //weeks worked per year
 
-	//psychic school costs
-	gamma_44_2 = -36.85, //type 2	unobserved heterogeneity in school attendance
-	gamma_44_3 = -150.6, //type 3	unobserved heterogeneity in school attendance
-
-	//work preferences
-
-	gamma_20 = <-16.32>,  //prefence for working full-time,
-	gamma_21 = <0, -2.645, -1.103>, //preferences for work for type2, type3
-	gamma_22 = <4.927>, //prefences for working full-time shifter
-	gamma_25 = <2.164, -.6864>, //age and full-time, part-time interactions
-
 	//Asset lower limit
 	mu_0 = .5523,
 	mu_1 = .0984,
 	mu_2 = -.0011,
 	mu_3 = .2507,
 	mu_4 = .4159,
-
-	//credit passing/failing
-//	theta_0 = <-4.00,1.00,-2.04,2.40>, //un observedtype 1, 2, 3, 4
-	theta_0 = .5,
-	theta_1 = .1,	//GPA (i'll make this ability)
-	theta_2 = .0730,	//grade they are in
-	theta_3 = .09,	//age
-	theta_4 = .00999,	//no credits
-	theta_5 = .0697,	 //no work
-	theta_6 = -.136,	 //pt work
-	theta_7 = -.22,	 //ft work
-
-	//Random HC function
-
-	//work
-	beta_0 = .19,
-	beta_1 = .05,
-	beta_2 = .07,
-	beta_3 = .50,
-	beta_4 = .08,
-	beta_5 = .10,
-	beta_6 = .20,
-	beta_7 = .40,
-
-	//school
-	phi_0 = .10,
-	phi_1 = .15,
-	phi_2 = .2,
-	phi_3 = .24,
-	phi_4 = .15,
-	
-	//Wage equation function
-
-	//minimum earnings
-	omega_1 = 325.2,
-	omega_2 = 51.53, //*H in wage function
-
-	alpha_0 = 2.9,
-	alpha_1 = -.0107, //part-time work
-	alpha_2 = -.4677, //enrolled in school
-	alpha_3 = -.1015, //black
-	alpha_4 = -.0284, //hispanic
-	
-	//Transfers
-	chi_0 =	10.8,	  //constant
-	chi_1 =	.1581,
-	chi_2=	.0021,
-	chi_3 =	.0033,
-	chi_4 =	-.1373,
-	chi_5 =	.0036,
-	chi_6 =	-.0054,
-	chi_7 =	.0366,
-	chi_8 =	.0467,
-	chi_9 =	-.0347,
-	chi_10 = .4932,
 	
 	//Tuition & Grants
 	tau_0 = <0, 27530, 17296, 14435, 10215>,  //tuition
 	tau = <-6097, 921.6, -34.7, -4.4, 2234.4, 4366.2, 944.6, 4123.0, 0.0, 0.0, 0.0 ;   //General: Cons, black, income/1000, family assets/1000, SAT_2, SAT_3, Sib, 4 year.
            -12641, 6774.1, -71.6, -5.9, 3747.9, 7352.0, 2958.2, 12169.7, 15130.8, -11764.6, -4281.5>; //Specific: Cons, black, income/1000, assets/1000, SAT_2, SAT_3, Sibs, SAT_2private, SAT_3Private, priv_elite, 2-year
-//	tau_1 = <-6097, 921.6, -34.7, -4.4, 2234.4, 4366.2, 944.6, 4123.0>,	 //General: Cons, black, income/1000, family assets/1000, SAT_2, SAT_3, Sib, 4 year.
-//	tau_2 = <-12641, 6774.1, -71.6, -5.9, 3747.9, 7352.0, 2958.2, 12169.7, 15130.8, -11764.6, -4281.5>; //Specific: Cons, black, income/1000, assets/1000, SAT_2, SAT_3, Sibs, SAT_2private, SAT_3Private, priv_elite, 2-year
-	
-	static decl 
+
+	static decl
+											data,
+											dinterest,
 		/** index attend school**/  		attend,
 		/*Unobserved HC**/					HC,
 											HC_C,
@@ -166,14 +119,26 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 											wageoffer,
 											leisure,
 											xper,											
+											auxwage,
+											IntRates,
+											Gamma,
+											Gamma_1,
+											Omega,
+											Omega_1,
+											Phi,
+											Phi_1,
+											Phi_2,
+											Phi_3,
+											Beta,
+											Beta_1,
 											xpt;
 
 			decl							gross,
-					//						wage,
 											transfers,
+											wage,
 											net_tuition,
 											n_loans;
-		
+ 
 	static 	Replicate();
 	static	Reachable();
 			Budget(FeasA);
@@ -184,11 +149,11 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 	static  Savings(FeasA);
 	static  Loans(FeasA);
 	static	Event();
-	static  wage(FeasA);
 	 	   	FeasibleActions(const Alpha); 
 	}
 
 	struct CollegeData : DataSet {
 	CollegeData(method=0);
-	}	
+	}
+
 
