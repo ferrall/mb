@@ -9,17 +9,30 @@ Initialize(1.0,Reachable, FALSE, 0);			//For experiment
 SetClock(NormalAging,TMax);
 SetDelta(0.95);
 
-//		IntRates = new FixedBlock("IntRates", <0.05, 0.05, 0.0, 0.07>);
+		Phi = new array[4];
+		Phi[0] = new Coefficients("Phi", <.10,.15,.2,.24,.15,.15>, MSchHCLabels);
+		Phi[1] = new Coefficients("Phi_1", <.19,.05,.07,.50,.08,.10,.20>, MWrkHCLabels);
+        Phi[2] = new Coefficients("Phi_2", <.05,.1,.1,.12,.076,.11>, MSchNCHCLabels);
+        Phi[3] = new Coefficients("Phi_3", <.085,.05,.07,.10,.08,.10,.05>, MWrkNCHCLabels);
 
+	/*	Gamma = new array[2];
+		Gamma[0] = new Coefficients("Gamma", <0, -36.85, -150.6>, MSchUtilLabels);
+		Gamma[1] = new Coefficients("Gamma_1", <-16.32, 0, -2.645, -1.103, 2.164>, MWrkUtilLabels);
+
+		Omega = new array[2];
+		Omega[0] = new Coefficients("Omega", <325.2, 51.53>, MinEarnLabels);
+		Omega[1] = new Coefficients("Omega_1", <2.9,0,-.0107, .067, 0.0, -0.22,0.0, 0.0, 0.0, 0.0>,MWageLabels);
+
+		Beta = new array[2];
+		Beta[0] = new Coefficients("Beta",	<0.0, 0.0, 0.0, 0.0>, MPrTrnsLabels);
+		Beta[1] = new Coefficients("Beta_1", <10.8,.1581,.0021,.0033>, MAmTrnsLabels);
+		
+	*/	
 		Gamma = new Coefficients("Gamma", <0, -36.85, -150.6>, MSchUtilLabels);
-		Gamma_1 = new Coefficients("Gamma", <-16.32, 0, -2.645, -1.103, 2.164>, MWrkUtilLabels);
+		Gamma_1 = new Coefficients("Gamma_1", <-16.32, 0, -2.645, -1.103, 2.164>, MWrkUtilLabels);
 		Omega = new Coefficients("Omega", <325.2, 51.53>, MinEarnLabels);
 	 	Omega_1 = new Coefficients("Omega_1", <2.9,0,-.0107, .067, 0.0, -0.22,0.0, 0.0, 0.0, 0.0>,MWageLabels);
 		Theta = new Coefficients("Theta", <.22, .1, .004, -.1, -.2>, MCreditLabels);
-   		Phi = new Coefficients("Phi", <.10,.15,.2,.24,.15,.15>, MSchHCLabels);
-		Phi_1 = new Coefficients("Phi_1", <.19,.05,.07,.50,.08,.10,.20>, MWrkHCLabels);
-		Phi_2 = new Coefficients("Phi", <.05,.1,.1,.12,.076,.11>, MSchNCHCLabels);
-		Phi_3 = new Coefficients("Phi_1", <.085,.05,.07,.10,.08,.10,.05>, MWrkNCHCLabels);
    		Beta = new Coefficients("Beta",	<0.0, 0.0, 0.0, 0.0>, MPrTrnsLabels);
    		Beta_1 = new Coefficients("Beta_1", <10.8,.1581,.0021,.0033>, MAmTrnsLabels);
 
@@ -27,7 +40,6 @@ SetDelta(0.95);
 		dinterest[iborrow] = new Determined("iborrow", par[iborrow]);
 		dinterest[iunsub] = new Determined("iunsub", par[iunsub]);
   
-
 /**Actions**/
 	Actions(
 		schoice = new ActionVariable("schoice", MSchooltype), //school choice;
@@ -49,8 +61,8 @@ SetDelta(0.95);
 		GROWNUp = new PermanentChoice("GROWNUp", GrowUp),		
 		Credits=  new Forget(new RandomUpDown("Credits", MaxCredits, QualityConstraints_2::Cr_Transit),GROWNUp,Forgotten),
 		SchoolType = new Forget(new PermanentChoice("SchoolType", schoice),GROWNUp,Forgotten),
-		asset = new Asset("asset", MaxAssets, dinterest[iborrow], QualityConstraints_2::Savings),
-		Sch_loans = new Asset("Sch_loans", MaxScAssets, dinterest[iunsub], QualityConstraints_2::Loans),
+		asset = new Asset("asset", MaxAssets, CV(dinterest[iborrow]), QualityConstraints_2::Savings),
+		Sch_loans = new Asset("Sch_loans", MaxScAssets, CV(dinterest[iunsub]), QualityConstraints_2::Loans),
 		HC = new Freeze(new RandomUpDown("HC", MaxHC, QualityConstraints_2::HC_trans), QualityConstraints_2::Event())		   //Event needs to be an age. 
 					);
 	asset.actual = savings.actual;
@@ -102,10 +114,17 @@ SetDelta(0.95);
 CollegeData::CollegeData(method) {
 	DataSet("Quality",method,FALSE);
 //	Observed(UseLabel);
-//	AuxiliaryOutcomes(wage);
+//	AuxiliaryOutcomes(wage);	 //Need to add parental transfers to Auxiliary
 	IDColumn("ID_97");
 	Read("Quality_Constraints.dta",TRUE);	
 	}
+*/
+
+/*
+
+NEED OBJECTIVE HERE. 
+
+
 */
   
 /**CONSTRAINTS ON CHOICE:**/
@@ -168,7 +187,7 @@ QualityConstraints_2::Reachable() {
 
 QualityConstraints_2::HC_trans(FeasA) {
      decl HC_up, HC_nc, HC_down;
-	 decl phi = CV(Phi), phi_1 = CV(Phi_1), phi_2 = CV(Phi_2), phi_3 = CV(Phi_3);
+	 decl phi = CV(Phi[0]), phi_1 = CV(Phi[1]), phi_2 = CV(Phi[2]), phi_3 = CV(Phi[3]);
 
 //     Now RandomUpDown always takes 3 prob.
 	if(!GROWNUp.v){
@@ -281,14 +300,4 @@ QualityConstraints_2::Event() {
 	return util;
 	}
 
-	//age, fixed effects condition on those to get moments ->
-	//wage, wage^2
-
-	//1 ) data files for niqlow
-
-	//auxillary
-
-	//compute in panel correlation between th momemnts  or contemporaneous
-
-	// 2) data set for calculating moments 
 	
