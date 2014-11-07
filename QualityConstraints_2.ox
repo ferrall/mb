@@ -77,14 +77,14 @@ SetDelta(0.95);
  
  
 //Fixed Effects:
-	GroupVariables(
-		Abil = new FixedEffect("abil", 1),
-		Race = new FixedEffect("race", 1),
-		Score = new FixedEffect("score", 1), 	//MScorelabel
-		Wealth = new FixedEffect("wealth", 1),	//MWealthlabel
-		Inc = new FixedEffect("income", 1), 		//MInclabel
-		Nsib = new FixedEffect("nsib", 1)	//sibling in college or not. 
-			   );
+//	GroupVariables(
+//		Abil = new FixedEffect("abil", 1),
+//		Race = new FixedEffect("race", 1),
+//		Score = new FixedEffect("score", 1), 	//MScorelabel
+//		Wealth = new FixedEffect("wealth", 1),	//MWealthlabel
+//		Inc = new FixedEffect("income", 1), 		//MInclabel
+//		Nsib = new FixedEffect("nsib", 1)	//sibling in college or not. 
+//			   );
 		auxwage =  new AuxiliaryVariable("wage");
 		AuxiliaryOutcomes(auxwage);
 			   
@@ -94,7 +94,7 @@ SetDelta(0.95);
 	decl Emax = new ValueIteration();
 //	data = new CollegeData(Emax);
 	
-	PD = new EmpiricalMoments("data",Emax,NotInData);
+	PD = new EmpiricalMoments("data",Emax,<0>);
 	PD->TrackingWithLabel(0,UseLabel,Credits,attend);
 	PD->TrackingWithLabel(0,NotInData,HC,GrowUp,savings);
 	PD->Read("Quality_Moments.dta");
