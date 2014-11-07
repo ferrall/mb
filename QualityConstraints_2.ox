@@ -94,16 +94,15 @@ SetDelta(0.95);
 	decl Emax = new ValueIteration();
 //	data = new CollegeData(Emax);
 	
-	Emax -> Solve();
-	PD = new PanelPrediction(0);
-	PD -> Predict(TMax);
-	PD -> Histogram(HC,TRUE,TRUE);
-	PD -> Histogram(GrowUp,TRUE,TRUE);
-	PD -> Histogram(Credits,TRUE,TRUE);
-	PD -> Histogram(attend,TRUE,TRUE);
-	PD -> Histogram(borrow,TRUE,TRUE);
-	PD -> Histogram(savings,TRUE,TRUE);
+	PD = new EmpiricalMoments("data",Emax,NotInData);
+	PD->TrackingWithLabel(0,UseLabel,Credits,attend);
+	PD->TrackingWithLabel(0,NotInData,HC,GrowUp,savings);
+	PD->Read("Quality_Moments.dta");
 //	PD -> Histogram(GROWNUp,TRUE,TRUE);
+	Emax -> Solve();
+	PD -> Predict(TMax);
+	PD->Histogram(Two);
+	println("%c",PD.tlabels,PD.flat[0]);
 	delete PD;
 }
 
