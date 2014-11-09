@@ -95,17 +95,20 @@ SetDelta(0.95);
 	
 	decl Emax = new ValueIteration();
 //	data = new CollegeData(Emax);
-	
+/*	
 	PD = new EmpiricalMoments("data",Emax,<0>);
 	PD->TrackingWithLabel(0,UseLabel,Credits,attend);
 	PD->TrackingWithLabel(0,NotInData,HC,GrowUp,savings);
 	PD->Read("Quality_Moments.dta");
 	PD -> Histogram(GROWNUp,TRUE,TRUE);
+	*/
 	Emax -> Solve();
+	/*
 	PD -> Predict(TMax);
 	PD->Histogram(Two);
 	println("%c",PD.tlabels,PD.flat[0]);
 	delete PD;
+	*/
 }
 
 //QualityConstraints_2::AuxiliaryOutcomes(wage)
@@ -259,7 +262,7 @@ QualityConstraints_2::Budget(FeasA) {
 
 	if(!CV(GROWNUp)){
 		/*Tuition & Grants*/
-//		decl grants = Tau[GrantsInt] + Tau[GrantsBlack]*Race + tau[GrantsInc]*CV(Inc) + tau[GrantsAbil1]*(CV(Abil==1)) + tau[GrantsAbil2]*CV(Abil==2) + tau[GrantsNsib]*CV(Nsib) + tau[GrantsAb1St2]*(CV(Abil==1)&CV(stype==1)) + tau[GrantsAb2St1]*(CV(Abil==2)&CV(stype==1));
+//		decl grants = Tau[GrantsInt]; // + Tau[GrantsBlack]*Race + tau[GrantsInc]*CV(Inc) + tau[GrantsAbil1]*(CV(Abil==1)) + tau[GrantsAbil2]*CV(Abil==2) + tau[GrantsNsib]*CV(Nsib) + tau[GrantsAb1St2]*(CV(Abil==1)&CV(stype==1)) + tau[GrantsAb2St1]*(CV(Abil==2)&CV(stype==1));
 		decl grants = 5;
 		net_tuition = (tau_0[stype] - grants)*att1;
 		n_loans = 0.0;
