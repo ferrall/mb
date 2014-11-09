@@ -80,12 +80,13 @@ SetDelta(0.95);
 	GroupVariables(
 		Abil = new FixedEffect("abil", 1),
 		Race = new FixedEffect("race", 1),
-		Score = new FixedEffect("score", 1), 	//MScorelabel
-		Wealth = new FixedEffect("wealth", 1),	//MWealthlabel
+//		Score = new FixedEffect("score", 1), 	//MScorelabel
+//		Wealth = new FixedEffect("wealth", 1),	//MWealthlabel
 		Inc = new FixedEffect("income", 1), 		//MInclabel
 		Nsib = new FixedEffect("nsib", 1)	//sibling in college or not. 
 			   );
 		auxwage =  new AuxiliaryVariable("wage");
+		auxtransfer = new AuxiliaryVariable("transfers");
 		AuxiliaryOutcomes(auxwage);
 			   
 //	Volume = LOUD;
@@ -114,7 +115,7 @@ SetDelta(0.95);
 CollegeData::CollegeData(method) {
 	DataSet("Quality",method,FALSE);
 //	Observed(UseLabel);
-//	AuxiliaryOutcomes(wage);	 //Need to add parental transfers to Auxiliary
+//	AuxiliaryOutcomes(wage, transfers);	 //Need to add parental transfers to Auxiliary
 	IDColumn("ID_97");
 	Read("Quality_Constraints.dta",TRUE);	
 	}
