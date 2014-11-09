@@ -35,7 +35,7 @@ SetDelta(0.95);
 		Theta = new Coefficients("Theta", <.22, .1, .004, -.1, -.2>, MCreditLabels);
    		Beta = new Coefficients("Beta",	<0.0, 0.0, 0.0>, MPrTrnsLabels);
    		Beta_1 = new Coefficients("Beta_1", <10.8,.0021,.0033>, MAmTrnsLabels);
-		Tau_1 = new Coefficients("Tau_1", <-6097, 921.6, -34.7, 2234.4, 4366.2, 944.6, 4123.0, 0.0>, MGrantsLabels);
+		Tau = new Coefficients("Tau", <-6097, 921.6, -34.7, 2234.4, 4366.2, 944.6, 4123.0, 0.0>, MGrantsLabels);
 
 		dinterest = new array[MIntLabels];
 		dinterest[iborrow] = new Determined("iborrow", par[iborrow]);
