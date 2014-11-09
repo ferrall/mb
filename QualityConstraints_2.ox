@@ -33,8 +33,9 @@ SetDelta(0.95);
 		Omega = new Coefficients("Omega", <325.2, 51.53>, MinEarnLabels);
 	 	Omega_1 = new Coefficients("Omega_1", <2.9,0,-.0107, .067, 0.0, -0.22,0.0, 0.0, 0.0, 0.0>,MWageLabels);
 		Theta = new Coefficients("Theta", <.22, .1, .004, -.1, -.2>, MCreditLabels);
-   		Beta = new Coefficients("Beta",	<0.0, 0.0, 0.0, 0.0>, MPrTrnsLabels);
-   		Beta_1 = new Coefficients("Beta_1", <10.8,.1581,.0021,.0033>, MAmTrnsLabels);
+   		Beta = new Coefficients("Beta",	<0.0, 0.0, 0.0>, MPrTrnsLabels);
+   		Beta_1 = new Coefficients("Beta_1", <10.8,.0021,.0033>, MAmTrnsLabels);
+		Tau_1 = new Coefficients("Tau_1", <-6097, 921.6, -34.7, 2234.4, 4366.2, 944.6, 4123.0, 0.0>, MGrantsLabels);
 
 		dinterest = new array[MIntLabels];
 		dinterest[iborrow] = new Determined("iborrow", par[iborrow]);
@@ -50,8 +51,8 @@ SetDelta(0.95);
 	 	GrowUp = new ActionVariable("GrowUp", MPhaselabel)); //,
 
 	work.actual = <0.0;0.5;1.0>;
-	borrow.actual = <0.0; 3000.0; 6000.0>;
-	savings.actual = <0.0; 1000.0; 5000.0; 10000.0; 20000.0>;
+	borrow.actual = <0.0; 3.0; 6.0>;
+	savings.actual = <0.0; 1.0; 5.0; 10.0; 20.0>;
 
 /**State Variables:**/
 
@@ -86,7 +87,7 @@ SetDelta(0.95);
 		Nsib = new FixedEffect("nsib", 1)	//sibling in college or not. 
 			   );
 		auxwage =  new AuxiliaryVariable("wage");
-		auxtransfer = new AuxiliaryVariable("transfers");
+//		auxtransfer = new AuxiliaryVariable("transfers");
 		AuxiliaryOutcomes(auxwage);
 			   
 //	Volume = LOUD;
@@ -95,16 +96,15 @@ SetDelta(0.95);
 	decl Emax = new ValueIteration();
 //	data = new CollegeData(Emax);
 	
+	PD = new EmpiricalMoments("data",Emax,<0>);
+	PD->TrackingWithLabel(0,UseLabel,Credits,attend);
+	PD->TrackingWithLabel(0,NotInData,HC,GrowUp,savings);
+	PD->Read("Quality_Moments.dta");
+	PD -> Histogram(GROWNUp,TRUE,TRUE);
 	Emax -> Solve();
-	PD = new PanelPrediction(0);
 	PD -> Predict(TMax);
-	PD -> Histogram(HC,TRUE,TRUE);
-	PD -> Histogram(GrowUp,TRUE,TRUE);
-	PD -> Histogram(Credits,TRUE,TRUE);
-	PD -> Histogram(attend,TRUE,TRUE);
-	PD -> Histogram(borrow,TRUE,TRUE);
-	PD -> Histogram(savings,TRUE,TRUE);
-//	PD -> Histogram(GROWNUp,TRUE,TRUE);
+	PD->Histogram(Two);
+	println("%c",PD.tlabels,PD.flat[0]);
 	delete PD;
 }
 
@@ -115,7 +115,11 @@ SetDelta(0.95);
 CollegeData::CollegeData(method) {
 	DataSet("Quality",method,FALSE);
 //	Observed(UseLabel);
+<<<<<<< HEAD
 //	AuxiliaryOutcomes(wage, transfers);	 //Need to add parental transfers to Auxiliary
+=======
+//	AuxiliaryOutcomes(wage);	 //Need to add parental transfers to Auxiliary
+>>>>>>> 671a6aa801451629c99ac5c8a80c5ae243aa8261
 	IDColumn("ID_97");
 	Read("Quality_Constraints.dta",TRUE);	
 	}
@@ -237,7 +241,7 @@ QualityConstraints_2::Budget(FeasA) {
 	if (curt==0) return 0;
 	
 	decl BA = 0, Age = Age0 + curt, sch_repayment;
-	decl stype = CV(SchoolType), score = CV(Score), schloans = Sch_loans.actual[CV(Sch_loans)];	//getting values 
+	decl stype = CV(SchoolType), schloans = Sch_loans.actual[CV(Sch_loans)];	//getting values 
 	decl att1 = FeasA[][attend.pos], wrk1 = FeasA[][work.pos], sav1 = FeasA[][borrow.pos];
 	decl wage_shock = wagesig*AV(wageoffer);
 
@@ -250,18 +254,14 @@ QualityConstraints_2::Budget(FeasA) {
 	wage = (wrk1.==0) .? ((omega[MinEarnInt]) + (omega[MinEarnHC])*CV(HC))*52
 	                  .: (CV(HC)*exp(omega_1[WageInt] + omega_1[WagePT]*(wrk1.==1) + omega_1[WageAtt]*att1 + omega_1[WageHC]*CV(HC) + wage_shock))*hours*weeks.*AV(wrk1)/2; //yearly wages too high right now 
 	/*Parental Transfers*/
-	transfers = (curt>=TMax-2) ? 0 : beta_1[AmTrnsInt] + beta_1[AmTrnsAtt]*att1 + beta_1[AmTrnsParW]*CV(Wealth) + beta_1[AmTrnsParInc]*CV(Inc);
+	transfers = (curt>=TMax-2) ? 0 : beta_1[AmTrnsInt] + beta_1[AmTrnsAtt]*att1 + beta_1[AmTrnsParInc]*CV(Inc);
 	gross = AV(asset) + wage + transfers;
 
 	if(!CV(GROWNUp)){
 		/*Tuition & Grants*/
-		decl grants= 
-			setbounds(
-				tau* (1|CV(Race)|CV(Inc)|CV(Wealth)|(score==1)|(score==2)|CV(Nsib)|((score==1)&&(stype==2))|((score==2)&&(stype==2))|(stype==1) | 0.0 )  //4 year
-				+ AV(gshocks)'
-				,0.0,+.Inf);
-		//no one is getting grants right now with these parameter values
-		net_tuition = (tau_0[stype] - sumc(grants))*att1;
+//		decl grants = Tau[GrantsInt] + Tau[GrantsBlack]*Race + tau[GrantsInc]*CV(Inc) + tau[GrantsAbil1]*(CV(Abil==1)) + tau[GrantsAbil2]*CV(Abil==2) + tau[GrantsNsib]*CV(Nsib) + tau[GrantsAb1St2]*(CV(Abil==1)&CV(stype==1)) + tau[GrantsAb2St1]*(CV(Abil==2)&CV(stype==1));
+		decl grants = 5;
+		net_tuition = (tau_0[stype] - grants)*att1;
 		n_loans = 0.0;
 		return borrow.actual[FeasA[][borrow.pos]];
 		}

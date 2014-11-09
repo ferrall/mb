@@ -55,8 +55,9 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 	enum{WrkHCInt, WrkHCFT, WrkHCPT, WrkHCSType, WrkHCType1, WrkHCType2, WrkHCType3, MWrkHCLabels} //HC Wrk (up) - Phi_1
 	enum{SchHCNCInt, SchNCAbil, SchHCNCType1, SchHCNCType2, SchHCNCType3, SchHCNCType4, MSchNCHCLabels} //HC School (No change) - Phi_3
 	enum{WrkHCNCInt, WrkHCNCFT, WrkHCNCPT, WrkHCSNCType, WrkHCNCType1, WrkHCNCType2, WrkHCNCType3, MWrkNCHCLabels} //HC Wrk (No change) - Phi_4
-	enum{PrTrnsInt, PrTrnsParInc, PrTrnsParW, PrTrnsAtt, MPrTrnsLabels}	//Prob Parental Transfer - beta
-	enum{AmTrnsInt, AmTrnsParInc, AmTrnsParW, AmTrnsAtt, MAmTrnsLabels}	//Amount Parental Transfer - beta_1
+	enum{PrTrnsInt, PrTrnsParInc, PrTrnsAtt, MPrTrnsLabels}	//Prob Parental Transfer - beta
+	enum{AmTrnsInt, AmTrnsParInc, AmTrnsAtt, MAmTrnsLabels}	//Amount Parental Transfer - beta_1
+	enum{GrantsInt, GrantsBlack, GrantsInc, GrantsAbil1, GrantsAbil2, GrantsNsib, GrantsAb1St2, GrantsAb2St1, MGrantsLabels} //grants labels
 //	enum{  ,MShocksLabel}
 
 //Need Grants
@@ -87,9 +88,7 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 	mu_4 = .4159,
 	
 	//Tuition & Grants
-	tau_0 = <0, 27530, 17296, 14435, 10215>,  //tuition
-	tau = <-6097, 921.6, -34.7, -4.4, 2234.4, 4366.2, 944.6, 4123.0, 0.0, 0.0, 0.0 ;   //General: Cons, black, income/1000, family assets/1000, SAT_2, SAT_3, Sib, 4 year.
-           -12641, 6774.1, -71.6, -5.9, 3747.9, 7352.0, 2958.2, 12169.7, 15130.8, -11764.6, -4281.5>; //Specific: Cons, black, income/1000, assets/1000, SAT_2, SAT_3, Sibs, SAT_2private, SAT_3Private, priv_elite, 2-year
+	tau_0 = <0, 27530, 17296, 14435, 10215>;  //tuition
 
 	static decl
 											data,
@@ -129,6 +128,7 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 											Phi_1,
 											Phi_2,
 											Phi_3,
+											Tau,
 											Beta,
 											Beta_1,
 											xpt;
