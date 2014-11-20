@@ -86,59 +86,43 @@ SetDelta(0.95);
 		Inc = new FixedEffect("income", 1), 		//MInclabel
 		Nsib = new FixedEffect("nsib", 1)	//sibling in college or not. 
 			   );
-		auxwage =  new AuxiliaryVariable("wage");
+			   
+//		auxwage =  new AuxiliaryVariable("wage");
 //		auxtransfer = new AuxiliaryVariable("transfers");
-		AuxiliaryOutcomes(auxwage);
+//		AuxiliaryOutcomes(auxwage);
 			   
 //	Volume = LOUD;
 	CreateSpaces();
 	
 	decl Emax = new ValueIteration();
 //	data = new CollegeData(Emax);
-/*	
+	
 	PD = new EmpiricalMoments("data",Emax,<0>);
 	PD->TrackingWithLabel(0,UseLabel,Credits,attend);
 	PD->TrackingWithLabel(0,NotInData,HC,GrowUp,savings);
 	PD->Read("Quality_Moments.dta");
-	PD -> Histogram(GROWNUp,TRUE,TRUE);
-	*/
 	Emax -> Solve();
-	/*
 	PD -> Predict(TMax);
 	PD->Histogram(Two);
 	println("%c",PD.tlabels,PD.flat[0]);
 	delete PD;
-	*/
+	
 }
 
 //QualityConstraints_2::AuxiliaryOutcomes(wage)
 
 /** Read in the data.**/
- /*
+
 CollegeData::CollegeData(method) {
 	DataSet("Quality",method,FALSE);
 //	Observed(UseLabel);
-<<<<<<< HEAD
-//	AuxiliaryOutcomes(wage, transfers);	 //Need to add parental transfers to Auxiliary
-=======
 //	AuxiliaryOutcomes(wage);	 //Need to add parental transfers to Auxiliary
->>>>>>> 671a6aa801451629c99ac5c8a80c5ae243aa8261
 	IDColumn("ID_97");
 	Read("Quality_Constraints.dta",TRUE);	
 	}
-*/
-
-/*
-
-NEED OBJECTIVE HERE. 
-
-
-*/
   
 /**CONSTRAINTS ON CHOICE:**/
 QualityConstraints_2::FeasibleActions(const Alpha) {
-
-//there is a mistake here, in some phase you cannot attend, but you can borrow
 	
 	decl Age = curt + Age0, A;
 
