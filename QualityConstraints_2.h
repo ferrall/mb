@@ -46,18 +46,18 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 	enum{Age0 = 18, MaxCredits=5, MaxTAtt = 10, MaxAssets = 5, MaxScAssets = 3, MaxYrsWrk = 10, TMax=2+MaxTAtt+MaxYrsWrk,Noffers = 3, MaxHC = 3}
 
 	enum{iborrow, isaving, isub, iunsub, MIntLabels}
-	enum{SchUtilType1, SchUtilType2, SchUtilType3, MSchUtilLabels}	  //School Utility - Gamma
-	enum{WrkUtilFullTime, WrkUtilType_1, WrkUtilType_2, WrkUtilType_3, WrkUtilAge, MWrkUtilLabels}		//Work Utility - Gamma_1
-	enum{CrPassInter, CrPassAbil, CrPassAge, CrPassPT, CrPassFT, MCreditLabels}	 //Credit passing - Theta
-	enum{MinEarnInt, MinEarnHC, MinEarnLabels} //minimum earnings - Omega
-	enum{WageInt, WageFT, WagePT, WageAbil, WageHC, WageAtt, WageType1, WageType2, WageType3, MWageLabels} 	//wages - Omega_1
-	enum{SchHCInt, SchAbil, SchHCType1, SchHCType2, SchHCType3, SchHCType4, MSchHCLabels} //HC School (up) - Phi
-	enum{WrkHCInt, WrkHCFT, WrkHCPT, WrkHCSType, WrkHCType1, WrkHCType2, WrkHCType3, MWrkHCLabels} //HC Wrk (up) - Phi_1
-	enum{SchHCNCInt, SchNCAbil, SchHCNCType1, SchHCNCType2, SchHCNCType3, SchHCNCType4, MSchNCHCLabels} //HC School (No change) - Phi_3
-	enum{WrkHCNCInt, WrkHCNCFT, WrkHCNCPT, WrkHCSNCType, WrkHCNCType1, WrkHCNCType2, WrkHCNCType3, MWrkNCHCLabels} //HC Wrk (No change) - Phi_4
-	enum{PrTrnsInt, PrTrnsParInc, PrTrnsAtt, MPrTrnsLabels}	//Prob Parental Transfer - beta
-	enum{AmTrnsInt, AmTrnsParInc, AmTrnsAtt, MAmTrnsLabels}	//Amount Parental Transfer - beta_1
-	enum{GrantsInt, GrantsBlack, GrantsInc, GrantsAbil1, GrantsAbil2, GrantsNsib, GrantsAb1St2, GrantsAb2St1, MGrantsLabels} //grants labels
+	enum{SchUtilType1, SchUtilType2, SchUtilType3, MSchUtilLabels}	  //School Utility - Gamma = 3 parameters
+	enum{WrkUtilFullTime, WrkUtilType_1, WrkUtilType_2, WrkUtilType_3, WrkUtilAge, MWrkUtilLabels}		//Work Utility - Gamma_1  = 5 parameters
+	enum{CrPassInter, CrPassAbil, CrPassAge, CrPassPT, CrPassFT, MCreditLabels}	 //Credit passing - Theta = 5 parameters
+	enum{MinEarnInt, MinEarnHC, MinEarnLabels} //minimum earnings - Omega = 2 parameters
+	enum{WageInt, WageFT, WagePT, WageAbil, WageHC, WageAtt, WageType1, WageType2, WageType3, MWageLabels} 	//wages - Omega_1 = 9 parameters
+	enum{SchHCInt, SchAbil, SchHCType1, SchHCType2, SchHCType3, SchHCType4, MSchHCLabels} //HC School (up) - Phi = 6 parameters
+	enum{WrkHCInt, WrkHCFT, WrkHCPT, WrkHCSType, WrkHCType1, WrkHCType2, WrkHCType3, MWrkHCLabels} //HC Wrk (up) - Phi_1 = 7 parameters
+	enum{SchHCNCInt, SchNCAbil, SchHCNCType1, SchHCNCType2, SchHCNCType3, SchHCNCType4, MSchNCHCLabels} //HC School (No change) - Phi_3 = 6 parameters
+	enum{WrkHCNCInt, WrkHCNCFT, WrkHCNCPT, WrkHCSNCType, WrkHCNCType1, WrkHCNCType2, WrkHCNCType3, MWrkNCHCLabels} //HC Wrk (No change) - Phi_4	= 7 parameters
+	enum{PrTrnsInt, PrTrnsParInc, PrTrnsAtt, MPrTrnsLabels}	//Prob Parental Transfer - beta = 3 parameters
+	enum{AmTrnsInt, AmTrnsParInc, AmTrnsAtt, MAmTrnsLabels}	//Amount Parental Transfer - beta_1 = 3 parameters
+	enum{GrantsInt, GrantsBlack, GrantsInc, GrantsAbil1, GrantsAbil2, GrantsNsib, GrantsAb1St2, GrantsAb2St1, MGrantsLabels} //grants labels = 8 parameters
 //	enum{  ,MShocksLabel}
 
 //Need Grants
@@ -129,6 +129,7 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 											Phi_2,
 											Phi_3,
 											Tau,
+											ind,
 											Beta,
 											Beta_1,
 											xpt;
