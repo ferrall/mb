@@ -130,6 +130,7 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 											Phi_2,
 											Phi_3,
 											Beta,
+											ind,
 											Beta_1,
 											xpt;
 

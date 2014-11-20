@@ -85,8 +85,8 @@ SetDelta(0.95);
 //		Inc = new FixedEffect("income", 1), 		//MInclabel
 //		Nsib = new FixedEffect("nsib", 1)	//sibling in college or not. 
 //			   );
-		auxwage =  new AuxiliaryVariable("wage");
-		AuxiliaryOutcomes(auxwage);
+//		auxwage =  new AuxiliaryVariable("wage");
+//		AuxiliaryOutcomes(auxwage);
 			   
 //	Volume = LOUD;
 	CreateSpaces();
