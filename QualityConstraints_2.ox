@@ -5,9 +5,10 @@ QualityConstraints_2::Replicate(){
 decl KW, PD, PS;
 
 Initialize(1.0,Reachable, FALSE, 0);			//For experiment
-//SetClock(UncertainLongevity,TMax,0.0);
-SetClock(NormalAging,TMax);
+SetClock(UncertainLongevity,TMax,0.0);
+//SetClock(NormalAging,TMax);
 SetDelta(0.95);
+
 
 		Phi = new array[4];
 		Phi[0] = new Coefficients("Phi", <.10,.15,.2,.24,.15,.15>, MSchHCLabels);
@@ -15,6 +16,12 @@ SetDelta(0.95);
         Phi[2] = new Coefficients("Phi_2", <.05,.1,.1,.12,.076,.11>, MSchNCHCLabels);
         Phi[3] = new Coefficients("Phi_3", <.085,.05,.07,.10,.08,.10,.05>, MWrkNCHCLabels);
 
+ /*
+		Phi[0] = new Coefficients("Phi", <.10,.15,.2,.24,.15,.15>, MSchHCLabels);
+		Phi[1] = new Coefficients("Phi_1", <.19,.05,.07,.50,.08,.10,.20>, MWrkHCLabels);
+        Phi[2] = new Coefficients("Phi_2", <.05,.1,.1,.12,.076,.11>, MSchNCHCLabels);
+        Phi[3] = new Coefficients("Phi_3", <.085,.05,.07,.10,.08,.10,.05>, MWrkNCHCLabels);
+   */
 	/*	Gamma = new array[2];
 		Gamma[0] = new Coefficients("Gamma", <0, -36.85, -150.6>, MSchUtilLabels);
 		Gamma[1] = new Coefficients("Gamma_1", <-16.32, 0, -2.645, -1.103, 2.164>, MWrkUtilLabels);
@@ -40,6 +47,12 @@ SetDelta(0.95);
 		dinterest = new array[MIntLabels];
 		dinterest[iborrow] = new Determined("iborrow", par[iborrow]);
 		dinterest[iunsub] = new Determined("iunsub", par[iunsub]);
+
+		dtuition = new array[MTuitionLabels];
+		dtuition[TuitionSch1] = new Determined("T_Pri_Elite", tau_0[TuitionSch1]);
+		dtuition[TuitionSch2] = new Determined("T_Pub_Elite", tau_0[TuitionSch2]);
+		dtuition[TuitionSch3] = new Determined("T_Pri", tau_0[TuitionSch3]);
+		dtuition[TuitionSch4] = new Determined("T_Pub", tau_0[TuitionSch4]);
   
 /**Actions**/
 	Actions(
@@ -96,12 +109,13 @@ SetDelta(0.95);
 	
 	decl Emax = new ValueIteration();
 //	data = new CollegeData(Emax);
-	
-	PD = new EmpiricalMoments("data",Emax,<0>);
-	PD->TrackingWithLabel(0,UseLabel,Credits,attend);
-	PD->TrackingWithLabel(0,NotInData,HC,GrowUp,savings);
-	PD->Read("Quality_Moments.dta");
+
+     PD = new EmpiricalMoments("data",Emax,UseLabel);
+	 PD->TrackingWithLabel(AllFixed,UseLabel,Credits,attend,Sch_loans, work);
+     PD->TrackingWithLabel(AllFixed,NotInData,HC,GrowUp,savings,SchoolType);
+     PD->Read("Quality_Moments.dta");
 	Emax -> Solve();
+//	Explore(Emax, 10, Beta);
 	PD -> Predict(TMax);
 	PD->Histogram(Two);
 	println("%c",PD.tlabels,PD.flat[0]);
@@ -112,7 +126,7 @@ SetDelta(0.95);
 //QualityConstraints_2::AuxiliaryOutcomes(wage)
 
 /** Read in the data.**/
-
+/*
 CollegeData::CollegeData(method) {
 	DataSet("Quality",method,FALSE);
 //	Observed(UseLabel);
@@ -120,7 +134,7 @@ CollegeData::CollegeData(method) {
 	IDColumn("ID_97");
 	Read("Quality_Constraints.dta",TRUE);	
 	}
-  
+ */ 
 /**CONSTRAINTS ON CHOICE:**/
 QualityConstraints_2::FeasibleActions(const Alpha) {
 	
@@ -177,20 +191,26 @@ QualityConstraints_2::Reachable() {
 	return new QualityConstraints_2();
 	}
 
-QualityConstraints_2::HC_trans(FeasA) {
-     decl HC_up, HC_nc, HC_down;
+
+ QualityConstraints_2::HC_trans(FeasA) {
+     decl HC_u, HC_n, HC_up, HC_nc, HC_down;
 	 decl phi = CV(Phi[0]), phi_1 = CV(Phi[1]), phi_2 = CV(Phi[2]), phi_3 = CV(Phi[3]);
 
 //     Now RandomUpDown always takes 3 prob.
 	if(!GROWNUp.v){
-    HC_up = (FeasA[][attend.pos].==1).*(phi[SchHCInt] + phi[SchAbil]*CV(Abil) + phi[SchHCType1]*(SchoolType.v==1) + phi[SchHCType2]*(SchoolType.v==2) + phi[SchHCType3]*(SchoolType.v==3) + phi[SchHCType4]*(SchoolType.v==4));
-    HC_nc = (FeasA[][attend.pos].==1).*(phi_2[SchHCNCInt] + phi_2[SchNCAbil]*CV(Abil) + phi_2[SchHCNCType1]*(SchoolType.v==1) + phi_2[SchHCNCType2]*(SchoolType.v==2) + phi_2[SchHCNCType3]*(SchoolType.v==3) + phi_2[SchHCNCType4]*(SchoolType.v==4));;																										   
+    HC_u = (FeasA[][attend.pos].==1).*(phi[SchHCInt] + phi[SchAbil]*CV(Abil) + phi[SchHCType1]*(SchoolType.v==1) + phi[SchHCType2]*(SchoolType.v==2) + phi[SchHCType3]*(SchoolType.v==3) + phi[SchHCType4]*(SchoolType.v==4));
+    HC_n = (FeasA[][attend.pos].==1).*(phi_2[SchHCNCInt] + phi_2[SchNCAbil]*CV(Abil) + phi_2[SchHCNCType1]*(SchoolType.v==1) + phi_2[SchHCNCType2]*(SchoolType.v==2) + phi_2[SchHCNCType3]*(SchoolType.v==3) + phi_2[SchHCNCType4]*(SchoolType.v==4));;																										   
+	HC_up = exp(HC_u)./(1+exp(HC_u + HC_n));
+	HC_nc = exp(HC_n)./(1+exp(HC_u + HC_n));
 	}
 	else{
-    HC_up = phi_1[WrkHCInt] + phi_1[WrkHCPT]*(FeasA[][work.pos].==1)  + phi_1[WrkHCNCFT]*(FeasA[][work.pos].==2);
-    HC_nc = phi_3[WrkHCNCInt] + phi_3[WrkHCNCPT]*(FeasA[][work.pos].==1) + phi_3[WrkHCNCFT]*(FeasA[][work.pos].==2);	
+    HC_u = phi_1[WrkHCInt] + phi_1[WrkHCPT]*(FeasA[][work.pos].==1)  + phi_1[WrkHCNCFT]*(FeasA[][work.pos].==2);
+    HC_n = phi_3[WrkHCNCInt] + phi_3[WrkHCNCPT]*(FeasA[][work.pos].==1) + phi_3[WrkHCNCFT]*(FeasA[][work.pos].==2);
+	HC_up = exp(HC_u)./(1+exp(HC_u + HC_n));
+	HC_nc = exp(HC_n)./(1+exp(HC_u + HC_n));
 	}
     HC_down = 1 - HC_up - HC_nc;
+//	println(HC_down~HC_nc~HC_up);
 	if (any(HC_down~HC_nc~HC_up .< 0)) oxrunerror("HC probs. invalid");
      return HC_down~HC_nc~HC_up;
 }
@@ -199,7 +219,7 @@ QualityConstraints_2::HC_trans(FeasA) {
 
 /**Transition of Credits**/
 QualityConstraints_2::Cr_Transit(FeasA){
-	decl prob_fail, prob_pass, prob_down;
+	decl prob_fail, prob_pass, prob_p, prob_down;
 	decl theta = CV(Theta);
 
 	decl Age = curt + Age0;
@@ -207,18 +227,20 @@ QualityConstraints_2::Cr_Transit(FeasA){
   	if(!CV(GROWNUp)){
 		decl ivals_work = FeasA[][work.pos], ivals_attend = FeasA[][attend.pos]; 
 	    prob_pass = ivals_attend .? (theta[CrPassInter] + theta[CrPassAbil]*CV(Abil) + theta[CrPassPT]*(ivals_work.==.5) + theta[CrPassFT]*(ivals_work.==1)) .: 0;
+		prob_p = exp(prob_pass)./(1+exp(prob_pass));
 		 }
 	else{
-		prob_pass = 0;
+		prob_p = 0;
 	}
 	prob_down = 0;
-	prob_fail = 1 - prob_pass;
+	prob_fail = 1 - prob_p;
 
-	return prob_down ~ prob_fail ~ prob_pass;
+	return prob_down ~ prob_fail ~ prob_p;
 }
 
 QualityConstraints_2::Loans(FeasA){
-	decl th = Settheta(ind[tracking]);
+//	decl th = Settheta(ind[tracking]);
+decl th = Settheta(I::all[tracking]);
 	return th->Budget(FeasA);	
 	}
 	
@@ -228,27 +250,28 @@ QualityConstraints_2::Budget(FeasA) {
 	if (curt==0) return 0;
 	
 	decl BA = 0, Age = Age0 + curt, sch_repayment;
-	decl stype = CV(SchoolType), schloans = Sch_loans.actual[CV(Sch_loans)];	//getting values 
+	decl stype = CV(SchoolType);
+	decl schloans = Sch_loans.actual[CV(Sch_loans)];	//getting values 
 	decl att1 = FeasA[][attend.pos], wrk1 = FeasA[][work.pos], sav1 = FeasA[][borrow.pos];
 	decl wage_shock = wagesig*AV(wageoffer);
-
+	decl tau = CV(Tau);
 	decl omega = CV(Omega), omega_1 = CV(Omega_1), beta = CV(Beta), beta_1 = CV(Beta_1);
-
-	//	enum{AmTrnsInt, AmTrnsParInc, AmTrnsParW, AmTrnsAtt, MAmTrnsLabels}	//Amount Parental Transfer - beta_1
-
 	
 	 /*Wages*/
 	wage = (wrk1.==0) .? ((omega[MinEarnInt]) + (omega[MinEarnHC])*CV(HC))*52
 	                  .: (CV(HC)*exp(omega_1[WageInt] + omega_1[WagePT]*(wrk1.==1) + omega_1[WageAtt]*att1 + omega_1[WageHC]*CV(HC) + wage_shock))*hours*weeks.*AV(wrk1)/2; //yearly wages too high right now 
+
+
+
 	/*Parental Transfers*/
 	transfers = (curt>=TMax-2) ? 0 : beta_1[AmTrnsInt] + beta_1[AmTrnsAtt]*att1 + beta_1[AmTrnsParInc]*CV(Inc);
 	gross = AV(asset) + wage + transfers;
 
 	if(!CV(GROWNUp)){
 		/*Tuition & Grants*/
-//		decl grants = Tau[GrantsInt]; // + Tau[GrantsBlack]*Race + tau[GrantsInc]*CV(Inc) + tau[GrantsAbil1]*(CV(Abil==1)) + tau[GrantsAbil2]*CV(Abil==2) + tau[GrantsNsib]*CV(Nsib) + tau[GrantsAb1St2]*(CV(Abil==1)&CV(stype==1)) + tau[GrantsAb2St1]*(CV(Abil==2)&CV(stype==1));
+//		decl grants = tau[GrantsInt] + tau[GrantsBlack]*CV(Race) + tau[GrantsInc]*CV(Inc) + tau[GrantsAbil1]*(CV(Abil==1)) + tau[GrantsAbil2]*CV(Abil==2) + tau[GrantsNsib]*CV(Nsib) + tau[GrantsAb1St2]*CV(Abil==1)&&CV(stype==1) + tau[GrantsAb2St1]*CV(Abil==2)&&CV(stype==1);
 		decl grants = 5;
-		net_tuition = (tau_0[stype] - grants)*att1;
+		net_tuition = (CV(tau_0[stype]) - grants)*att1;
 		n_loans = 0.0;
 		return borrow.actual[FeasA[][borrow.pos]];
 		}

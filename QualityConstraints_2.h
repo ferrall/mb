@@ -46,6 +46,7 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 	enum{Age0 = 18, MaxCredits=5, MaxTAtt = 10, MaxAssets = 5, MaxScAssets = 3, MaxYrsWrk = 10, TMax=2+MaxTAtt+MaxYrsWrk,Noffers = 3, MaxHC = 3}
 
 	enum{iborrow, isaving, isub, iunsub, MIntLabels}
+	enum{TuitionSch0, TuitionSch1, TuitionSch2, TuitionSch3, TuitionSch4, MTuitionLabels}
 	enum{SchUtilType1, SchUtilType2, SchUtilType3, MSchUtilLabels}	  //School Utility - Gamma = 3 parameters
 	enum{WrkUtilFullTime, WrkUtilType_1, WrkUtilType_2, WrkUtilType_3, WrkUtilAge, MWrkUtilLabels}		//Work Utility - Gamma_1  = 5 parameters
 	enum{CrPassInter, CrPassAbil, CrPassAge, CrPassPT, CrPassFT, MCreditLabels}	 //Credit passing - Theta = 5 parameters
@@ -70,7 +71,8 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 	sig = <498, 0, 6796>, //shock 1: work, shock 2: college attendance, 3: wage
 
 	par = <0.05, 0.05, 0.0, 0.07>,
-  
+	tau_0 = <0, 27033, 14425, 17296, 10215>,  //tuition
+
 
 	//Risk aversion
 	rho = 2, //literature
@@ -85,14 +87,13 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 	mu_1 = .0984,
 	mu_2 = -.0011,
 	mu_3 = .2507,
-	mu_4 = .4159,
+	mu_4 = .4159;
 	
-	//Tuition & Grants
-	tau_0 = <0, 27530, 17296, 14435, 10215>;  //tuition
 
 	static decl
 											data,
 											dinterest,
+											dtuition,
 		/** index attend school**/  		attend,
 		/*Unobserved HC**/					HC,
 											HC_C,
@@ -120,6 +121,7 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 											xper,											
 											auxwage,
 											IntRates,
+											ElitePri,
 											Gamma,
 											Gamma_1,
 											Omega,
