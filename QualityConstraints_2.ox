@@ -114,15 +114,15 @@ SetDelta(0.95);
 	 PD->TrackingWithLabel(AllFixed,UseLabel,Credits,attend,Sch_loans, work);
      PD->TrackingWithLabel(AllFixed,NotInData,HC,GrowUp,savings,SchoolType);
      PD->Read("Quality_Moments.dta");
-	Emax -> Solve();
-//	Explore(Emax, 10, Beta);
-	PD -> Predict(TMax);
-	PD->Histogram(Two);
-	println("%c",PD.tlabels,PD.flat[0]);
+	 Emax -> Solve();
+	 PD -> Predict(TMax);
+	 PD->Histogram(Two);
+	 println("%c",PD.tlabels,PD.flat[0]);
+	 Explore(PD, 10, Omega,Beta_1);
 	delete PD;
-	
 }
 
+	
 //QualityConstraints_2::AuxiliaryOutcomes(wage)
 
 /** Read in the data.**/
@@ -256,7 +256,6 @@ QualityConstraints_2::Budget(FeasA) {
 	decl wage_shock = wagesig*AV(wageoffer);
 	decl tau = CV(Tau);
 	decl omega = CV(Omega), omega_1 = CV(Omega_1), beta = CV(Beta), beta_1 = CV(Beta_1);
-	
 	 /*Wages*/
 	wage = (wrk1.==0) .? ((omega[MinEarnInt]) + (omega[MinEarnHC])*CV(HC))*52
 	                  .: (CV(HC)*exp(omega_1[WageInt] + omega_1[WagePT]*(wrk1.==1) + omega_1[WageAtt]*att1 + omega_1[WageHC]*CV(HC) + wage_shock))*hours*weeks.*AV(wrk1)/2; //yearly wages too high right now 
