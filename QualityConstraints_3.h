@@ -1,9 +1,7 @@
-//#import "DDP"
-//#import "FiveO"
+#import "DDP"
+#import "FiveO"
 
-#import "niqlow"
-
-struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from KW
+struct QualityConstraints_3 : ExtremeValue	{	 //ExpostSmoothing just copied from KW
 
 	decl InSubSample;  //sample
 	

@@ -1,6 +1,6 @@
-#include "QualityConstraints_2.h"
+#include "QualityConstraints_3.h"
 
-QualityConstraints_2::Replicate(){
+QualityConstraints_3::Replicate(){
 
 decl KW, PD, PS;
 
@@ -11,11 +11,17 @@ SetDelta(0.95);
 
 
 		Phi = new array[4];
-		Phi[0] = new Coefficients("Phi", <.20,.15,.02,.124,.15,.15>, MSchHCLabels);	//still problems with this?
-		Phi[1] = new Coefficients("Phi_1", <.15,.05,.07,.50,.08,.10,.20>, MWrkHCLabels);
+		Phi[0] = new Coefficients("Phi", <.10,.15,.2,.24,.15,.15>, MSchHCLabels);
+		Phi[1] = new Coefficients("Phi_1", <.19,.05,.07,.50,.08,.10,.20>, MWrkHCLabels);
         Phi[2] = new Coefficients("Phi_2", <.05,.1,.1,.12,.076,.11>, MSchNCHCLabels);
         Phi[3] = new Coefficients("Phi_3", <.085,.05,.07,.10,.08,.10,.05>, MWrkNCHCLabels);
 
+ /*
+		Phi[0] = new Coefficients("Phi", <.10,.15,.2,.24,.15,.15>, MSchHCLabels);
+		Phi[1] = new Coefficients("Phi_1", <.19,.05,.07,.50,.08,.10,.20>, MWrkHCLabels);
+        Phi[2] = new Coefficients("Phi_2", <.05,.1,.1,.12,.076,.11>, MSchNCHCLabels);
+        Phi[3] = new Coefficients("Phi_3", <.085,.05,.07,.10,.08,.10,.05>, MWrkNCHCLabels);
+   */
 	/*	Gamma = new array[2];
 		Gamma[0] = new Coefficients("Gamma", <0, -36.85, -150.6>, MSchUtilLabels);
 		Gamma[1] = new Coefficients("Gamma_1", <-16.32, 0, -2.645, -1.103, 2.164>, MWrkUtilLabels);
@@ -31,9 +37,10 @@ SetDelta(0.95);
 	*/	
 		Gamma = new Coefficients("Gamma", <0, -36.85, -150.6>, MSchUtilLabels);
 		Gamma_1 = new Coefficients("Gamma_1", <-16.32, 0, -2.645, -1.103, 2.164>, MWrkUtilLabels);
-		Omega = new Coefficients("Omega", <325.2, 51.53>, MinEarnLabels);  //change to positive?
+		Omega = new Coefficients("Omega", <325.2, 51.53>, MinEarnLabels);
 	 	Omega_1 = new Coefficients("Omega_1", <2.9,0,-.0107, .067, 0.0, -0.22,0.0, 0.0, 0.0, 0.0>,MWageLabels);
 		Theta = new Coefficients("Theta", <.22, .1, .004, -.1, -.2>, MCreditLabels);
+   		Beta = new Coefficients("Beta",	<0.0, 0.0, 0.0>, MPrTrnsLabels);
    		Beta_1 = new Coefficients("Beta_1", <10.8,.0021,.0033>, MAmTrnsLabels);
 		Tau = new Coefficients("Tau", <-6097, 921.6, -34.7, 2234.4, 4366.2, 944.6, 4123.0, 0.0>, MGrantsLabels);
 
@@ -85,10 +92,12 @@ SetDelta(0.95);
  
 //Fixed Effects:
 	GroupVariables(
-		Abil = new FixedEffect("abil", 4),
-		Race = new FixedEffect("race", 2),
-		Inc = new FixedEffect("income", 3), 		//MInclabel
-		Nsib = new FixedEffect("nsib", 2)	//sibling in college or not. 
+		Abil = new FixedEffect("abil", 1),
+		Race = new FixedEffect("race", 1),
+//		Score = new FixedEffect("score", 1), 	//MScorelabel
+//		Wealth = new FixedEffect("wealth", 1),	//MWealthlabel
+		Inc = new FixedEffect("income", 1), 		//MInclabel
+		Nsib = new FixedEffect("nsib", 1)	//sibling in college or not. 
 			   );
 			   
 //		auxwage =  new AuxiliaryVariable("wage");
@@ -103,13 +112,13 @@ SetDelta(0.95);
 
      PD = new EmpiricalMoments("data",Emax,UseLabel);
 	 PD->TrackingWithLabel(AllFixed,UseLabel,Credits,attend,Sch_loans, work);
-     PD->TrackingWithLabel(AllFixed,NotInData,HC,GrowUp,savings, SchoolType);
+     PD->TrackingWithLabel(AllFixed,NotInData,HC,GrowUp,savings,SchoolType);
      PD->Read("Quality_Moments.dta");
 	 Emax -> Solve();
 	 PD -> Predict(TMax);
 	 PD->Histogram(Two);
 	 println("%c",PD.tlabels,PD.flat[0]);
-//	 Explore(PD, 10, Omega_1,Beta_1, Phi);
+	 Explore(PD, 10, Omega,Beta_1);
 	delete PD;
 }
 
@@ -127,7 +136,7 @@ CollegeData::CollegeData(method) {
 	}
  */ 
 /**CONSTRAINTS ON CHOICE:**/
-QualityConstraints_2::FeasibleActions(const Alpha) {
+QualityConstraints_3::FeasibleActions(const Alpha) {
 	
 	decl Age = curt + Age0, A;
 
@@ -157,7 +166,7 @@ QualityConstraints_2::FeasibleActions(const Alpha) {
 	return A;
 	}
 
-QualityConstraints_2::Reachable() {
+QualityConstraints_3::Reachable() {
 
 	if (curt == 0) {
 			if (CV(GROWNUp) || !(CV(Sch_loans)==0) || !(CV(asset)==0) || !(CV(Credits)==0) || !(CV(SchoolType)==0) ) return 0;
@@ -183,26 +192,25 @@ QualityConstraints_2::Reachable() {
 	}
 
 
- QualityConstraints_2::HC_trans(FeasA) {
+ QualityConstraints_3::HC_trans(FeasA) {
      decl HC_u, HC_n, HC_up, HC_nc, HC_down;
 	 decl phi = CV(Phi[0]), phi_1 = CV(Phi[1]), phi_2 = CV(Phi[2]), phi_3 = CV(Phi[3]);
 
 //     Now RandomUpDown always takes 3 prob.
 	if(!GROWNUp.v){
-    HC_u = (phi[SchHCInt] + phi[SchAbil]*CV(Abil) + (FeasA[][attend.pos].==1).*phi[SchHCType1]*(SchoolType.v==1) + (FeasA[][attend.pos].==1).*phi[SchHCType2]*(SchoolType.v==2) + (FeasA[][attend.pos].==1).*phi[SchHCType3]*(SchoolType.v==3) + (FeasA[][attend.pos].==1).*phi[SchHCType4]*(SchoolType.v==4));
-    HC_n = (phi_2[SchHCNCInt] + phi_2[SchNCAbil]*CV(Abil) + (FeasA[][attend.pos].==1).*phi_2[SchHCNCType1]*(SchoolType.v==1) + (FeasA[][attend.pos].==1).*phi_2[SchHCNCType2]*(SchoolType.v==2) + (FeasA[][attend.pos].==1).*phi_2[SchHCNCType3]*(SchoolType.v==3) + (FeasA[][attend.pos].==1).*phi_2[SchHCNCType4]*(SchoolType.v==4));;																										   
-	HC_up = exp(HC_u)./(1+exp(HC_u) + exp(HC_n));
-	HC_nc = exp(HC_n)./(1+exp(HC_u) + exp(HC_n));
+    HC_u = (FeasA[][attend.pos].==1).*(phi[SchHCInt] + phi[SchAbil]*CV(Abil) + phi[SchHCType1]*(SchoolType.v==1) + phi[SchHCType2]*(SchoolType.v==2) + phi[SchHCType3]*(SchoolType.v==3) + phi[SchHCType4]*(SchoolType.v==4));
+    HC_n = (FeasA[][attend.pos].==1).*(phi_2[SchHCNCInt] + phi_2[SchNCAbil]*CV(Abil) + phi_2[SchHCNCType1]*(SchoolType.v==1) + phi_2[SchHCNCType2]*(SchoolType.v==2) + phi_2[SchHCNCType3]*(SchoolType.v==3) + phi_2[SchHCNCType4]*(SchoolType.v==4));;																										   
+	HC_up = exp(HC_u)./(1+exp(HC_u + HC_n));
+	HC_nc = exp(HC_n)./(1+exp(HC_u + HC_n));
 	}
 	else{
     HC_u = phi_1[WrkHCInt] + phi_1[WrkHCPT]*(FeasA[][work.pos].==1)  + phi_1[WrkHCNCFT]*(FeasA[][work.pos].==2);
     HC_n = phi_3[WrkHCNCInt] + phi_3[WrkHCNCPT]*(FeasA[][work.pos].==1) + phi_3[WrkHCNCFT]*(FeasA[][work.pos].==2);
-	HC_up = exp(HC_u)./(1+exp(HC_u) + exp(HC_n));
-	HC_nc = exp(HC_n)./(1+exp(HC_u) + exp(HC_n));
+	HC_up = exp(HC_u)./(1+exp(HC_u + HC_n));
+	HC_nc = exp(HC_n)./(1+exp(HC_u + HC_n));
 	}
-    HC_down = (1)./(1 + exp(HC_u) + exp(HC_nc));
-//	HC_down = 1 - HC_up - HC_nc;
-	if (any(HC_down~HC_nc~HC_up .< 0)) println(HC_down~HC_nc~HC_up);
+    HC_down = 1 - HC_up - HC_nc;
+//	println(HC_down~HC_nc~HC_up);
 	if (any(HC_down~HC_nc~HC_up .< 0)) oxrunerror("HC probs. invalid");
      return HC_down~HC_nc~HC_up;
 }
@@ -210,7 +218,7 @@ QualityConstraints_2::Reachable() {
 
 
 /**Transition of Credits**/
-QualityConstraints_2::Cr_Transit(FeasA){
+QualityConstraints_3::Cr_Transit(FeasA){
 	decl prob_fail, prob_pass, prob_p, prob_down;
 	decl theta = CV(Theta);
 
@@ -230,14 +238,14 @@ QualityConstraints_2::Cr_Transit(FeasA){
 	return prob_down ~ prob_fail ~ prob_p;
 }
 
-QualityConstraints_2::Loans(FeasA){
+QualityConstraints_3::Loans(FeasA){
 //	decl th = Settheta(ind[tracking]);
 decl th = Settheta(I::all[tracking]);
 	return th->Budget(FeasA);	
 	}
 	
 //Net savings for school loans
-QualityConstraints_2::Budget(FeasA) {
+QualityConstraints_3::Budget(FeasA) {
 	gross = net_tuition = n_loans = 0.0;
 	if (curt==0) return 0;
 	
@@ -301,4 +309,3 @@ QualityConstraints_2::Event() {
 
 	return util;
 	}
-	

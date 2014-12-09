@@ -10,16 +10,16 @@ Initialize(1.0,Reachable, TRUE, 0);
 SetClock(UncertainLongevity,TMax,0.0);
 SetDelta(0.97);
 
-//schoice = 0;
+schoice = 0;	//
 
 /**Actions**/
 	Actions(
 		work = new ActionVariable("work", MWorklabel), //work
 		attend = new ActionVariable("attend", MAttendlabel), //attend school
 	 	GrowUp = new ActionVariable("GrowUp", MPhaselabel),  
-		savings = new ActionVariable("savings", MaxAssets),
-		borrow = new ActionVariable("loans",3) ,
-		schoice = new ActionVariable("schoice", MSchooltype) //school choice
+		savings = new ActionVariable("savings", MaxAssets) //,
+//		borrow = new ActionVariable("loans",3) //,
+//		schoice = new ActionVariable("schoice", MSchooltype) //school choice
 	);
 
 	borrow.actual = <0.0, 3000.0, 6000.0 >;
@@ -41,16 +41,17 @@ SetDelta(0.97);
 //ENDOGENOUS STATES:
 #ifdef RandomHumanCapital
 
-//	SchoolType = 0;
+	SchoolType = 0;
+	Sch_loans = 0;
 
 	EndogenousStates(
  		HC = new RandomUpDown("HC", MaxHC, QualityConstraints::HC_trans),				
 		Credits= new RandomUpDown("Credits", MaxCredits, QualityConstraints::Transit),
-		//	BA = new Deterministic("BA", 1, QualityConstraints::Degree_Status),	 //should this be in a state block with credits..right?
-		Sch_loans = new Asset("Sch_loans", MaxScAssets, r1, QualityConstraints::Loans),
+		//	BA = new Deterministic("BA", 1, QualityConstraints::Degree_Status),
+	//	Sch_loans = new Asset("Sch_loans", MaxScAssets, r1, QualityConstraints::Loans),
 		asset = new Asset("asset", MaxAssets, r, QualityConstraints::Savings), 
-		GROWNUp = new LaggedAction("GROWNUp", GrowUp),
-		SchoolType = new PermanentChoice("SchoolType", schoice)
+		GROWNUp = new LaggedAction("GROWNUp", GrowUp)
+//		, SchoolType = new PermanentChoice("SchoolType", schoice)
 		);
 
 	asset.actual = <0.0, 1000.0, 5000.0, 20000.0, 50000.0>;
@@ -64,7 +65,7 @@ SetDelta(0.97);
 		Credits= new RandomUpDown("Credits", MaxCredits, QualityConstraints::Transit),
 		//Sch_loans = ActionAccumulator("Sch_Loans", Sch_borrowing),
 		assets = new LaggedAction("assets", savings),
-		GROWNUp = new ActionTracker("GROWNUp", GrowUp, 1 //), 
+		GROWNUp = new ActionTracker("GROWNUp", GrowUp, 1) //, 
 //		SchoolType = new PermanentChoice("SchoolType", schoice)
 );
 #endif
@@ -80,7 +81,7 @@ SetDelta(0.97);
 	
 #ifdef KWApprox	
 	CreateSpaces();
-//	Volume = SILENT;
+	Volume = NOISY;
 	KW = new KeaneWolpin(ones(1,10)~constant(0.1,1,A1-10),0);
 //	KW.Volume = SILENT;
 	KW -> Solve();
@@ -88,26 +89,13 @@ SetDelta(0.97);
 	CreateSpaces();
 	Volume = NOISY;
 	decl Emax = new ValueIteration(0);
-//	Emax.Volume = NOISY;
+	Emax.Volume = NOISY;
 	Emax -> Solve(0,0);
 //	DPDebug::outV(TRUE,0);
 	PD = new PanelPrediction(0);
 	PD -> Predict(50);
 	PD -> Histogram(GROWNUp,TRUE,TRUE);
 	delete PD;
-
-
-	DPDebug::outV(TRUE,0);
-	PS = new Panel(1,0);
-//	PS = Simulate(10,20,0,TRUE);
-//		DPDebug::outV(TRUE,&vmat);	   //just printing value function
-//		chprob |= reverser(vmat[][sizec(vmat)-1]');
-//		ps[row] = new Panel(row,0);	//making new panel
-//		ps[row] -> Simulate(10,400,0,TRUE);  //draw from ergodic distn.
-		//Simulate ( N , T , ErgOrStateMat , DropTerminal ) -> (Paths, time periods, 0, TRUE)
-//		ps[row]->Flat();		
-//		data |= selectifr(ps[row].flat,ps[row].flat[][columns(ps[row].flat)-1]);
-//		}
 
 
 #endif
@@ -157,7 +145,7 @@ QualityConstraints::FeasibleActions(const Alpha) {
 //	A.*= 1 - (asset.actual[asset.v] + savings.actual[savings.pos] .< B_Limit_Sav);
 
 	/*Old Age: No work choice, all full-time*/
-	if(curt >= TMax-2) A.* (Alpha[][work.pos].==2); //work full-time only
+	if(curt == TMax-2) A.* (Alpha[][work.pos].==2); //work full-time only
 
 	/*Need to rule out school borrowing while not attending*/
 	if(CV(SchoolType) != 0 && CV(GROWNUp) == 0) A.*= 1 - (Alpha[][attend.pos] == 0).*(Alpha[][borrow.pos] != 0);   //need to change if change gridpoints
@@ -217,8 +205,15 @@ QualityConstraints::HC_trans(FeasA) {
 		HC_nc =	AV(GROWNUp) == 0 ? beta_4*(AV(SchoolType)==1)*(FeasA[][attend.pos].==1) + beta_5*(AV(SchoolType)==2).*(FeasA[][attend.pos].==1) //Learning								  
 								 : beta_0 + beta_1*(FeasA[][work.pos].==0) + beta_2*(FeasA[][work.pos].==1) + beta_3*(FeasA[][work.pos].==2); //working
 		HC_down = 1 - HC_up - HC_nc;
-//		println("Human Capital", HC_up~HC_nc~HC_down~FeasA);
+		if(HC.v == 0){
+		return HC_down+HC_nc~HC_up;
+		}
+		else if(HC.v == MaxHC){
+		return HC_down~HC_nc+HC_up;
+		}
+		else{
 		return HC_down~HC_nc~HC_up;
+		}
 	}
 	else{
 	 	return 0~1~0;
@@ -233,6 +228,8 @@ QualityConstraints::Savings(FeasA){
 //Not taking into account wages etc etc. where should this be done?
 //	A.*= 1 - (asset.actual[asset.v] + savings.actual[savings.pos] .< B_Limit_Sav);
 	}
+
+
 
 QualityConstraints::Loans(FeasA){
 	decl th = Settheta(ind[tracking]);
@@ -259,7 +256,6 @@ QualityConstraints::Budget(FeasA) {
 
 //Not taking into account wages etc etc. where should this be done?
 //	A.*= 1 - (asset.actual[asset.v] + savings.actual[savings.pos] .< B_Limit_Sav);
-
 	if(!CV(GROWNUp)){
 		/*Tuition & Grants*/
 		decl grants= 
@@ -274,27 +270,39 @@ QualityConstraints::Budget(FeasA) {
 		}
 	else {
 		net_tuition = 0.0;
-		if (curt>=TMax-3) return -schloans; //so if loans are > 0 when transitioning to old age, it goes to zero. 
+		if (curt>=TMax-2) return -schloans; //so if loans are > 0 when transitioning to old age, it goes to zero. 
 		sch_repayment = (schloans)/(1 - (1/(1+r1))^(TMax-2 - curt))/(1-(1/(1+r1))); //denominator is a geometric series
 		n_loans = (gross .< sch_repayment) .? mu*schloans .: -sch_repayment;	//see if in default or not, choose the correct transition
 		return n_loans;
 		}
 	}
-
+ 
 //**Transition of Credits**//
 
 //need to fix.
 QualityConstraints::Transit(FeasA){
 
+	decl Age = curt + Age0;
+ 
 	if(CV(GROWNUp) == 0){
 		decl ivals_work = FeasA[][work.pos], ivals_attend = FeasA[][attend.pos]; 
 		decl pi_f = theta_1*CV(Abil) + theta_3*curt + theta_5*(ivals_work.==0) + (theta_5 + theta_6)*(ivals_work.<=.5) + (theta_5 + theta_6 + theta_7)*(ivals_work.==1);
-		println("Credits",pi_f~(1-pi_f)~0);
-		return 0~(pi_f)~(1-pi_f);
+	  /*
+		if(CV(Credits) == 0){
+			return pi_f~(1-pi_f);
+		}
+		else if(CV(Credits) == 20){
+			return zeros(rows(FeasA),1)~ones(rows(FeasA),1);
+		}
+		else{
+			return zeros(rows(FeasA),1)~pi_f~(1-pi_f);
+		}
+		*/
+		return zeros(rows(FeasA),1)~ones(rows(FeasA),1)~zeros(rows(FeasA),1);
 	}
 	else{
-		return 0~1~0; //No transition on credits when grownup. 
-	}
+		return zeros(rows(FeasA),1)~ones(rows(FeasA),1)~zeros(rows(FeasA),1); //No transition on credits when grownup.
+		}	
 
 }
 /*One Period Return*/
@@ -306,15 +314,19 @@ QualityConstraints::Utility() {
 	decl cons =	/*Consumption*/
 		//gross - net_tuition - n_loans - savings.actual[aa(savings)]' + borrow.actual[aa(borrow)]'; //not right?
 		//net-savings is state-and action-dependent change in asset holding:
-		wage + transfers - net_tuition - n_loans - savings.actual[aa(savings)]' + borrow.actual[aa(borrow)]'; //is this right?
+//		wage + transfers - net_tuition - n_loans - savings.actual[aa(savings)]'; //+ borrow.actual[aa(borrow)]'; //is this right?
+
+		wage + transfers - net_tuition - savings.actual[aa(savings)]';
 
 	/*Total one period utility*/
 	decl util = cons .<= 0.0 .? -.Inf .:  (cons.^(1-rho))/(1-rho) + aa(attend)*gamma_20 + aa(work)*gamma_22;
 
-//after raising wages, problem below is not an issue
-//	if (!any(util .!= -.Inf)) {
-//		println(cons~AV(asset)~gross~savings.actual[aa(savings)]);
-//		}
+//	println(cons~AV(asset)~gross~savings.actual[aa(savings)]);
+
+//error with utility is back
+	if (!any(util .!= -.Inf)) {
+		println(cons~AV(asset)~gross~savings.actual[aa(savings)]);
+		}
 
 	return util;
 	}

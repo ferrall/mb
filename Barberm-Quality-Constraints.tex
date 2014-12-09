@@ -1,0 +1,412 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%%    QED MA Essay Template
+%%%    written by Jeremy Lise
+%%%    lisej@qed.econ.queensu.ca
+%%%
+%%%    16 March, 2004
+%%%
+%%%    This template conforms to my understanding of the
+%%%    QED style requirements as of the above date.
+%%%
+%%%    You are free to use this template, but I do not
+%%%    guarantee it meets all the requirements.
+%%%    Comments are welcome.
+%%%
+%%%    To copile this example make sure you have the files:
+%%%    ma_template.tex, ma_figure.eps, and ma_template.bib.
+%%%
+%%%    Plus the style files for the bibliography:
+%%%    harvard.sty, cje.bst, and econometrica.bst
+%%%
+%%%    For more information on using LaTeX please see the
+%%%    excellent tutorial at U. Colorado at Boulder:
+%%%
+%%%    http://www.colorado.edu/ITS/docs/latex/
+%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%   Document Settings
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[letterpaper,12pt]{article}
+\usepackage{harvard}
+%\usepackage[active]{srcltx}
+\usepackage{graphics}
+\usepackage{pstricks,egameps}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%   Title Page Information
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{College Choice, Credit Constraints and Educational Attainment}
+\author{   Michael Barber \vspace{0.75in} \\
+    Queen's University \\
+    Kingston, Ontario, Canada}
+\date{Sept 2014 \vspace{1in} \\
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%   Double and Single Space Commands
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newlength{\defbaselineskip}
+\setlength{\defbaselineskip}{\baselineskip}
+\newcommand{\setlinespacing}[1]{\setlength{\baselineskip}{#1 \defbaselineskip}}
+\newcommand{\doublespacing}{\setlength{\baselineskip}{1.6 \defbaselineskip}}
+\newcommand{\singlespacing}{\setlength{\baselineskip}{\defbaselineskip}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%   Set Margins Here
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\textwidth=6in
+\textheight=9in
+\oddsidemargin=0.5in
+\evensidemargin=0.5in
+\topmargin=-0.5in
+% \parskip=3pt
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%   Actual Document Begins Here
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\doublespacing
+\maketitle \footnotetext{I am grateful to my supervisors Chris Ferrall and Marco Cozzi for their help and guidance. I would also like to thank the participants at the ``Theory + Data + Policy" conference for their suggestions. This project utilizes the Niqlow Ox package (https://jdi.econ.queensu.ca/niqlow)}
+
+\pagenumbering{roman}
+\begin{abstract}\addcontentsline{toc}{section}{Abstract}
+
+This paper formulates and estimates a dynamic model of borrowing, schooling and work decisions with highschool graduates choosing between colleges of differing quality and tuition profiles. To understand the role of credit constraints in determining the quality of college attended, I perform several counterfactual experiments on college tuition, government sponsored loans limits, as well as student loan repayment structure. Structural parameters of the model are estimated using the 1997 cohort of the National Longitudinal Survey of Youth (NLSY97). Results indicate that...
+
+
+\end{abstract}
+\newpage
+
+\newpage
+\pagenumbering{arabic}
+\section{Introduction}
+
+A significant portion of research into individual human capital accumulation has focused the relationship between college attendance, family income and ability, and in particular, the role of credit constraints in shaping educational attainment. This capital market failure arises due to the inherent riskiness and nondiversifiable nature of human capital investment, as well as the diffculty in pledging future skills as collateral (Friedman,1955). Research using data from the 1980s and early 1990s indicates that credit constraints had little impact on educational attainment of youths but played a much more important role in the late 1990s and early 2000s.\footnote{See Lochner and Belley (2007).} 
+
+The results of these studies can partially explain why college completion has remained relatively low despite large increases in college wage premiums. College wage premium have increased from 31\% to 54\% from 1983 to 2003 (Fortin, 2006) while the percentage of the population with bachelor's degrees has only increased from 21\% to 28\% (Stoops, 2004). Over this same period tuition levels have increased dramatically with average tuition, room and board at four-year colleges increasing from \$9,000 in 1983 to \$16,000 in 2003 (Johnson 2010).\footnote{Using 2004 dollars} However these overall trends ignore important heterogeneity across colleges with respect to labour market returns, graduation rates and tuition profiles.\footnote{Research on heterogeneity in labour market returns is discussed in Section 2.}
+
+There are large differences in college graduation rates and tuition across both selectivity and institutional control.\footnote{Selectivity corresponds to \% of applicants admitted, while insitutional control refers to whether the institution is public, private non-profit, or private for-profit} For the 2004 cohort, six-year graduation rates vary from 28.8\% at colleges with open admissions to 87.2\% for colleges that accept less than 25\% of their applicants. With respect to insitutional control, private non-profit insitutions have higher graduation rates both overall as well as when controlled for selectivity. For the 2004 cohort, the graduation rate for public institutions was 56\% versus an average graduation rate of 64.4\% for private non-profit insitutions. Graduation rates for private non-profit colleges are higher along insitutional controls for all levels of selectivity.\footnote{Table 1 in Appendix A provides more detailed information on graduation rates.} Tuition levels vary substantially along institutional control and parental income. For the 2004 cohort, mean tuition levels at private non-profit colleges were \$21,344, while it was only \$6,254 for public institutions (mean across all colleges was \$16,460).\footnote{Table 2 in Appendix A provides more detailed information on tuition profiles along selectivity and institutional control} 
+
+This paper develops and estimates a dynamic model of borrowing, work and schooling decisions in order to understand the role of unobserved characteristics, credit constraints, and college choice in shaping educational outcomes. Within this model, youths choose between heterogenous colleges that differ in institutional control and tuition levels. Once enrolled they accumulate college specific credits towards a degree. The structural parameters of the model are estimated using data from the main sample of the 1997 National Longitudinal Survey of Youth (NLSY97). Several counterfactual policies are explored to underscore the importance of access to credit markets, loan repayment schemes and tuition levels on educational attainment and college choice. 
+
+****Paragraph or two on policy experiments...How does college completion change? Overall attendance? Where students attend? Compare difference in terms of college graduation rates at different quality levels with respect to the above policy experiments.\footnote{Kinsler and Pavan (2010?, WP) find a positive relationship between family income and college quality, but are unable to determine if this is a result of credit constraints or other factors, such as differences in consumption value of schooling.}
+
+Policy Experiments:
+
+a) Tuition and aid policies:
+
+- Expanding general aid
+- changing tuition/institutional aid
+
+b) Expanding credit/GSL programs 
+
+- changing reliance of tuition on parental income
+- changing maximum loan amount
+
+c) Different repayment schemes\footnote{Ionescu (2011?) examines welfare effect of expansion of repayment methods} 
+- ICL, increasing repayment...
+
+This paper furthers the work of Keane and Wolpin (2001) by examining how credit constraints not only influence the college attendance decision, but also on the quality of college attended. By examining this margin we can have a greater understanding of various policies influence college choice and educational attainment. With important links between educational attainment and macroeconomic growth as well as intergenerational inequality, insights into what drives educational outcomes is of considerable importance.\footnote{See Barro (2001) for importance of human capital for growth. Restuccia and Urritia (2004) explore the importance of human capital in intergenerational persistence of earnings} 
+
+Additionally, this paper adds to the individual human capital accumulation literature by more fully accounting for student progress and graduation from post-secondary institutions. Past research has concentrated on years of schooling, ignoring how many credits student obtained towards their degree. Modeling student progression and graduation through credit accumulation allows a more complete picture of the effect of credit constraints on graduation rates and human capital accumulation. This paper also adds to the returns to quality literature be examining the returns to human capital and sheepskins effects of different colleges within a lifecycle model. 
+
+The rest of the paper is organized as follows. Section 2 provides a comprehensive review of the literature relevant to the proposed model. The complete model is specified in Section 3 and the estimation strategy fully explained. The data used in the analysis is fully detailed in Section 4 which includes a discussion of some important summary statistics. The results of the analysis are presented in Section 5 and counterfactual policy experiments are described in the following section. Section 7 provides concluding remarks. 
+
+\section{Review of Relevant Literature}
+
+\subsection{Review of Credit Constraints Literature}
+
+There is a substantial literature focusing on the role of credit constraints influencing decisions related to individual capital accumulation.\footnote{See Lochner and Naranjo (2011) for a recent review of this literature.} Research using the 1997 cohort of the NLSY dataset include Keane and Wolpin (2001), Carneiro and Heckman (2002) and Cameron and taber (2004). Keane and Wolpin formulate a discrete choice model of schooling concentrating on the relationship between parental transfers and educational attainment. They find evidence of credit constraints influence choices while attending school, such as part-time work and consumption rather than years of schooling. Carneiro and Heckman examine the relationship between college attendance and family income distinguishing between short-run liquidity constraints and long-run family/environmental constraints. They find evidence of small amounts of credit constraints (up to 8\% of population), but argue that long-run factors are the most important. Using both reduced form and structural approaches on the NLSY79, Cameron and Taber find no evidence of credit constraints. 
+
+Lochner and Belley (2007) use both the NLSY79 and NLSY97 to examine the changing role of family income and cognitive ability on educational outcomes. These data indicates that while ability plays a role in determining achievement in both waves of the NLSY, family income plays a more significant role in college attendence in the 1997 wave of the NLSY. Additionally, they find that family income is an important determinant of both college quality, and part/full-time work while enrolled in school. Using an educational choice model they find that credit constraints play a much more signifcant role in the early 2000s than the early 1980s. Johnson (2012) presents a dynamic human capital accumulation model that allows youths to go to choose between two and four-year colleges and attendence to be either part-time or full-time. Estimating his model using the NLSY97, findings indicate that credit constraints have only a small impact on delayed college entry and schooling attainment. Kinsler and Pavan (2011) use both the 1979 and 1997 cohorts of the NLSY to examine the effect of family income on college quality. They find evidence that credit constraints do effect college quality for both cohorts, but that the impact of family income on college quality has declined over time. 
+
+A major issue with the above studies is that the data contains no direct information on which students are credit constrained. Stinebrickner and Stinebrickner (2008) are able to overcome this problem by using a unique dataset from Barea College. This dataset contains information on which students are credit constrained, and thus allows a direct approach for analyzing how credit constraints influence drop-out decisions. They find, even at a college with no direct costs, that there are students whose educational outcomes are influenced by credit constraints. 
+
+%perhaps I should put a more detailed explanation of where this paper fits in here...and also how my results differ?
+
+\subsection{Review of Returns to Quality Literature}
+
+There is also evidence that college quality influences future labour market outcomes. Kane (1998) finds that attending a school with a higher SAT average of 100 points results in increases in future earnings by 3 to 7 percent. However, this study (as noted by Kane himself) fails to account for unobserved characteristics that may be linked to potential higher future earnings. To overcome the problem with unobserved attributes, Dale and Krueger (2002) use a matching technique and find that the effect of college quality is heterogeneous. In particular, those from low-income families see a greater benefit in attending high quality colleges than their high-income counterparts. Dale and Krueger (2011) use College and Beyond Survey data as well as earnings records to estimate returns to college selectivity for students who entered college in 1989 as well as students who attended college in 1976. They find that general return to college quality is small, once accounting for unobserved student ability. However, they also find that black and hispanic students, as well as those with less-educated parents have large returns to college selectivity. 
+
+Brewer et al (1999) use the National Longitudinal Study of the Hugh School class of 1972 and High school and Beyond to study the impact of college quality on labour market outcomes. They find that attending a selective college significantly increases wages and earnings and find that this premium has increased over time. 
+
+Black and Smith (2004) use propensity score matching with the 1979 wave of the NLSY to relax the linearity assumption often used in the literature. They find that sorting between colleges is asymetric in that there are more high ability students in low quality colleges than low ability students in high quality colleges. By relaxing the linearity assumption, their results indicate that standard estimates may understate the effects of college quality on labour market outcomes. Black and Smith 2006 use multiple proxies for college quality and a variety of estimation techniques and find that existing literature may be underestimating the returns to college quality. 
+
+Hoekstra 2009
+
+%perhaps I should put a more detailed explanation of where this paper fits in here...and how my results differ when compared to this literature
+
+\section{Model}
+
+\subsection{Overview}
+
+Individuals maximize lifetime utility through schooling, saving and work decisions. The model begins when agents finish high-school, which each period corresponding to a year. The model can be broken up into an initial college choice followed by three distinct phases. In the first phase, agents are eligible for schooling, and decide whether to attend one of J colleges and whether to participate in the labour market. During this school eligibility phase, an agent can also choose to permanently enter the labour market, and enter the second phase. Eligibility to attend school lasts a maximum of 10 periods, at which point agents can no longer attend college, and automatically enter the second phase of the model - working life. The time period where agents must transition to the second phase is donoted Ta (t = 10).  
+
+The second phase corresponds working life, where agents choose whether to participate in the labour market and also repay any outstanding college loans. This second phase lasts 10 years if the agent pays back any loan without default. If the agent defaults 10\% is added to the principle of the student loan and this phase is extended by 5 years. The time period where agents must transition to the third phase is denoted Tb (t = 20, 25).
+
+The final phase corresponds to working lives of mature workers. During this phase agents have constant skills and do not make labour/leisure choices, but choose savings to smooth over shocks to income. Agents who defaulted in the second phase of the model, and did not repay their loans by the end of that phase, face higher interested rates on borrowing in the third phase. This phase is approximated using an infinite horizon, with the first period corresponding to $t = Tb+1$. This phase provides a ``terminal" stationary value to agents following loan repayment. 
+
+\subsection{College Choice Phase}
+
+In the initial phase highschool graduates school whether to attend one of four different college types or to forgo college altogether (j = 0, 1...4). The value function in the inital college choice phase is simply the value function of the corresponding college the next year: 
+
+$V_0 = \max_{j} \{V_1(Omega_{1}|Omega_0, theta_0 = 1),...,V_1(Omega_{1}|Omega_0, theta_0 = 4), V_2(Omega_{1}|Omega_0, theta_0 = 0) \}$\footnote{State space, and choices corresponding to these value function are explained in detail below.}
+
+\subsection{First Phase}
+
+\noindent \emph{Preferences}
+
+Preferences in the first phase of the model are composed of two terms. The first is utility from consumption which is modeled as  a CRRA function. This first term is meant to capture consumption smoothing behaviour. The second is a term related to (dis)utility of school and work. The exact functional form of the second term is a linear function of its arguements with some interactions. The error term, $\epsilon$, represents a shock to preferences of work as well as attending different school types: \textbf{$\epsilon_t$} $= (\epsilon^j_t, \epsilon^l_t; j = 0,1,....J)$. These errors are independent across time, but can be correlated with each other within a period. 
+
+$u_t = \frac{c^{1-\gamma}}{1 - \gamma} + g(j_t, l_t, type, \epsilon_t)$
+
+\noindent \emph{State Space}
+
+State space in the first phase of the model spans student loans ($a_t^s$), credits accumulated ($C_t$), school attended ($j$), ability (AFQT), test score (SACT), parental income (INC) and unobserved type ($type$). 
+
+$\Omega = (a_t^{s}, C_t, j_t, HC_t, AFQT, SACT, INC, type)$
+
+\noindent \emph{Choice Set}
+
+Each period an individual makes work, schooling and saving decisions. Agents can choose to attend one of J colleges ($j = 1,...J$) or forgo college that period ($j=0$).\footnote{tuition, grants, and graduation are discussed in more detail below.} Agents can choose between three different work intensities ($l_t$): no work, part-time work or full-time work.  This corresponds to hours of 0, 20 or 40 hours a week: $l_t = \{0, 20, 40 \}$.\footnote{Corresponding to yearly hours of....}
+
+\noindent Denoting an agents choice as as $\theta$ and the choice set as $\Theta$:
+
+$\theta_t \in \Theta_t$
+
+$\theta = (j_t, l_t, a_t^{s})$
+
+\noindent \emph{School Types, Tuition and General Aid}
+
+There are four types of schools an agent can choose between in the first phase. These schools are heterogeneous across tuition and quality. Agents pay a yearly tuition amount of $tu_j$, which is dependent on college type, family income and ability.
+
+$tu_j = g^{tu}(INC, SACT, j)$
+
+Agents also receive general aid that can be used at more than one college. This general aid is dependent on family income, test score, and college choice.
+
+$aid_j = g^{aid}(INC, SACT, j_t)$
+
+\noindent \emph{Credit Accumulation and Graduation}
+
+Those who choose to enroll in college attempt 5 credits a year, and their probability of completing these credits is based upon ability, labour force participation, and unobserved type. The probability of earning $c$ credits at time t is denoted:
+
+$\pi(c_{t}| \Omega_t, \theta_t) = g^{\pi}(AFQT, l_t, type)$
+
+and:
+
+$C_{t+1} = C_t + c_t$
+
+Once an agent accumulates 20 credits at college j, the agent receives a bachelor degree from that college type ($BA = j$). \footnote{Agents can transfer one time during the eligibility period, but face restricted choices in which college they can transfer to, and transfer can result in a loss of credits.}
+
+\noindent \emph{Human Capital}
+
+Human capital ($HC_t$) is modeled as unobservable skills that can take on a finite number of values. The probability that it increases, stays the same or falls is a probability that is based on school attedance, labour force participation, college choice and unobserved type. 
+
+\noindent \emph{Labour Market}
+
+Past research has found that many youths work while attending college, and that youths may turn to the labour market if they face credit constraints.\footnote{Keane and Wolpin, 2001} While in college agents can choose to work part-time or full-time with a wage that is increasing in ability and age. College attendees cannot work full-time while enrolled and do not accumulate labour market experience. This is done to capture the fact that jobs while in school are likely to differ from full-time jobs once an agent has finished their schooling.\footnote{Autor et al. 2003 Peri and Sparber, 2007} 
+
+Agents who are not enrolled in college accumulate labour market experience, and earn wages based on their ability, accumulated human capital, and age. 
+
+$w_t = g^w(AFQT, HC_t, BA_t, t; \sigma_w)$
+
+\noindent \emph{Family Transfers}
+
+Past research has indicated that family transfers play an important role in subsidizing the costs associated with college attendance. In this model both the probability of receiving family transfers as well as the amount received are a function of family income, college attendance, age and wages. 
+
+$Pr_t = g^{Pr}(j_t, INC, t)$
+
+$tr_t = g^{tr}(j_t, INC, t)$
+
+\noindent \emph{School Related Borrowing}
+
+While enrolled in college agents have access to school-related borrowing. This borrowing is meant to mimic the federal GSL program. There are both yearly and cumulative limits for the Stafford Loan program that depend on whether a student is considered dependent or independent.\footnote{For this model, agents enrolled over the age of 24 are considered independent.} As in Johnson (2011), yearly loan limits are set to \$2,625, \$3,500, and \$5,500 for the first, second and all remaining year of enrollment for dependent undergraduates. The corresponding limits for independent graduates are \$6,625, \$7,500 and \$10,000. Cumulative loan limits were \$23,000 for dependents students and \$46,600 for independent students.
+
+The Stafford loan program allows students to borrow up to the full cost of their tuition, room and board until the yearly Stafford limit is reached. Students who face educational costs greater than their expected family contribution (EFC) are offered subsidized loans. For subsidized loans, the government pays interest accrued on the loan while the student is enrolled. The EFC is based on assets and income of both parents and the number of children the family has attending college.\footnote{See http://ifap.ed.gov/efcformulaguide/attachments/091913EFCFormulaGuide1415.pdf for complete details regarding the EFC}
+
+I assume that households with income below the median in my sample are eligible for subsidized loans.\footnote{According to Wei and Berkner (1997) students from household below the median income have the majority of their loans consist of subsidized loans. Johnson (2011) makes the same assumption.}
+
+\noindent \emph{Value Function}
+
+\begin{equation}
+V_1(\Omega_t) = \max_{\theta_t \in \Theta_t}  \frac{c_t^{1-\sigma}}{1 - \sigma} + \gamma(j_t, l_t, type, \epsilon) + \beta E[W(\Omega_{t+1})|\theta_t, \Omega_{t}] 
+\end{equation}
+
+Subject to:
+\begin{equation}
+c_t = (1+r_s) a^s_{t+1} - a^s_t +  w_t l_t + tr_t + I(att_t = 1) (aid_j - tu_j)
+\end{equation}
+
+Where: 
+
+ $E[W(\Omega_{t+1})|\theta_t, \Omega_{t}] = $
+
+$ \{ I(t<10) \max[V_1(\Omega_{t+1}|\theta_{t}, \Omega_{t}), V_2(\Omega_{t+1}|\theta_{t}, \Omega_{t})] $
+
+$+ I(t=10) V_2(\Omega_{t+1}|\theta_{t}, \Omega_{t}) \}$
+
+$cr_t = \pi(cr|AFQT, l_t, type)$ - Probability of earning $cr_t$ credits
+
+$BA_t = 1$ if $Cr_t >= 20$
+
+$Cr_{t+1} = Cr_t + cr_t$
+
+$H_{t+1} = (1-\delta)H_t + h_t$
+
+$h_t = h_t(AFQT, cr_t, j, l_t, BA_t, type)$
+
+$BA_t = 1$ if $Cr_t + cr_t >= 20$
+
+\subsection{Second Phase}
+
+In the second phase of the model, agents transition from school eligibility to their working lives. Individuals make labour/leisure choices, accumulate assets and human capital as well as repay any student loans accumulated in the first phase. 
+
+\noindent \emph{Preferences}
+
+Preferences in the second phase of the model are the same as those in the first phase:
+
+$u_t = \frac{c_t^{1-\gamma}}{1 - \gamma} + g(j, l, type, \epsilon_t)$
+
+\noindent \emph{State Space}
+
+A second asset variable, $a_t$, is added in the second phase of the model. This asset variable tracks individual asset accumulation and borrowing that is distinct from the school related borrowing ($a_t^s$). This separation allows several counterfactual experiments on loan repayments to be explored. A default state variable ($d_t$) is also added to track whether an individual has defaulted on their student loan repayments.\footnote{See ``Loan Repayment" and ``Default" section below for additional details.} Additionally, there are variables that indicate whether an individual has earned a degree ($BA_t$) as well as accumulated work experience. State variables tracking credits, school attended, ability and type remain. 
+
+$\Omega = (a_t, a_t^s, BA, HC_t, d_t, AFQT, type)$
+
+\noindent \emph{Choice Set}
+
+In the second phase of the model agents are no longer able to attend school or make school related borrowing. As a result, agents make only saving and work decisions during this phase of an agents' life. 
+
+$\Theta = (a_{t+1}, l_t)$
+
+\noindent \emph{Human Capital}
+
+Individual continue to accumulate human capital during the second phase through labour market experience. As individuals are no longer eligible for schooling, the probability of unobserved increasing, decreasing or staying the same is a function of labour market participation as well as unobserved type. 
+
+\noindent \emph{Labour Market}
+
+\noindent \emph{Non-School Related Borrowing}
+
+Non-school related borrowing is available for agents if they are not enrolled in school. Borrowing limits for this type of borrowing are functions of age, assets and human capital. If an agent is borrowing and is no longer enrolled in school the interest rate is set to 5.9\% which is the average prime rate between 2001-2007 minus inflation plus a two-percent risk premium. If an agent is saving the interest rate is set to 0.9\% which is the average real interest rate on one year US government bonds from 2001-2007.\footnote{This is what was done in Johnson (2011), I need to think how to model this.} 
+
+$\underline{a} = g^{\underline{a}}(a, \psi, t)$ 
+
+\noindent \emph{Loan Repayment}
+
+Once an agent is no longer enrolled in school, they must pay back any outstanding college loans. For simplicity, repayment is modeled after the standard repayment schedule offered by the the GSL program. 
+
+$\frac{a^s_t}{1 + \sum_{t = Ta}^{Tb -1} \frac{1}{(1 + r_l)^{Tb}}}$
+
+\noindent \emph{Default}
+
+If an agent cannot make the yearly repayment on their outstanding student loan then they are in default. If in default, the agent makes no student loan payment during the currect period and has $\mu \%$ added to the principal of the loan the next period.\footnote{Ionescu (2009)}. If an agent who has defaulted still has loans outstanding at the end of the extended repayment period, they face higher interest rates in the asset market in the third phase. 
+
+$d = 1 if w_t l_t + tr_t +  a_t < \frac{a^s_t}{1 + \sum_{t = Ta}^{Tb-1} \frac{1}{(1 + r_l)^{Tb}}}$
+
+$a^s_{t+1} = (1 + \mu)a^s_t$
+
+\noindent \emph{Value Functions}
+
+\noindent{Not in Default}
+\begin{equation}
+V^{nd}_2(\Omega_t) = \max_{\theta_t \in \Theta_t} u(c) + \gamma(j_t, l_t, type, \epsilon) + \beta E[V_2(\Omega_{t+1})|\theta_t, \Omega_{t}] 
+\end{equation}
+
+Subject to:
+\begin{equation}
+c_t = a_t - \frac{a^s_t}{1 + \sum_{t = Ta}^{Tb-1} \frac{1}{(1 + r_l)^{Tb}}} - (1+r)a_{t+1} +  w_t l_t + tr_t
+\end{equation}
+
+\noindent{In Default}
+\begin{equation}
+V^{d}_2(\Omega_t) = \max_{\theta_t \in \Theta_t} u(c) + \gamma(j_t, l_t, type, \epsilon) + \beta E[V_2(\Omega_{t+1})|\theta_t, \Omega_{t}] 
+\end{equation}
+
+Subject to:
+\begin{equation}
+c_t = a_t  - (1+r)a_{t+1} +  w_t l_t + tr_t
+\end{equation}
+
+\subsection{Third Phase}
+
+In the third phase, workers are assumed to work full-time, with wages following an AR-1 process and preferences being represented by a CRRA functional form. Tauchens (1986) method with (?) grid points is used to approximate this AR-1 process. If agents have not paid off their student loans when entering this phase, they face higher interest rates on borrowing ($r_i = r_{nd}$ or $r_d$ and $r_{d} > r_{nd}$)
+
+log $w_t = \rho$ log $w_{t-1} + u_t$
+
+$u_t = \frac{c^{1-\gamma}}{1 - \gamma}$
+
+\noindent \emph{State Space}
+
+State space in the third phase of the model consists of assets, wages last period, and an error. 
+
+$\Omega_t = (a_t, w_{t-1}, \epsilon_t)$
+
+\noindent \emph{Choice Set}
+
+$\Theta_t = (a_{t+1})$
+
+\noindent \emph{Value Function}
+\begin{equation}
+V_3 (\Omega_t) = \max_{\theta_t \in \Theta_t} U(c) + \beta E (V_3(\Omega_{t+1}| \Omega_t, \theta))
+\end{equation}
+
+Subject to:
+\begin{equation}
+a_{t+1} + c_t = w_t + (1+r_i) a_t
+\end{equation}
+where: $i = nd, d$ and $r_{d} > r_{nd}$
+
+\subsection{Objective Function}
+
+Agents maximize their discounted lifetime utility from highschool graduation (t = 1) given a discount factor of $\beta$. Maximization is achieved through the optimal choice of control variables given the realizations of shocks and wage draws. The final phase provides the model with an approximation of a terminal value for discounted utility after the age of 43. This terminal value function consists of the present discounted value of wages between ages 41-65, and assumes that all state variables remain constant from age 41-65. This terminal period is chosen as to be able to capture the majority of agents schooling and school-related loan repayments, while also limiting the size of the state-space. After solving for the terminal values associated with the stationary third phase, the model can be solved by backward induction.
+
+\section{Data}
+
+This section provides an overview of the data used in the estimation, and summary statistics of the data that is important for the data to account for. Individual level data is provided by the public-use version of the 1997 cohort of the National Longitudinal Survey of Youth (NLSY97). Access to the geocode version of the NLSY97 would allow me to identify specific colleges attended. Without this access, I must use the information available in the public use data set to separate colleges by type. To do this I create four college types (j in the model above) using institutional control, and tuition levels - high quality private, low quality public, high quality public and low quality public.
+
+The NLSY97 dataset contains a sampled of 8984 individuals who were 12-16 years old as of December 31, 1996. In this analysis, I use information supplied by both the individuals, and their parents from the first interview in 1997, until 2010. The NLSY97 contains comprehensive information on individual employment and schooling histories as well as family background. 
+
+\noindent \emph{Family Background}
+
+The NLSY97  provides numerous variables relating to family background including family wealth, family income and sibling college atttendance. Family wealth and income variables are... 
+
+\noindent \emph{Schooling Measures}
+
+This model utilizes a number of schooling variables contained in the NLSY97. The main NLSY97 data set contains histories of colleges individuals attended, including college sector\footnote{Ex. public, private non-profit, private for-profit}, yearly tuition fees, college loans outstanding, credit accumulation and degree status. The NLSY97 also contains information on standardized test scores including SAT/ACT scores, as well test scores for the Armed Services Vocational Aptitude Batter (ASVAB). The ASVAB is comprised of 12 separate tests, but the ASVAB variable in the NLSY97 is comprised of verbal/math scores which is meant to mimic the Armed Forces Qualifying Test (AFQT) often used as a proxy for ability.\footnote{For a complete list of the tests see: http://www.bls.gov/nls/handbook/2005/nlshc2.pdf}  These test scores are converted into quartiles for this analysis. 
+
+\noindent \emph{Labour Market}
+
+Labour market variables included in the NLSY97 that relate to this model include hours work, average wages, and assets. 
+
+
+\section{Estimation Results}
+
+Not currently available. 
+
+\subsection{Model Results}
+
+Not currently available. 
+
+\subsection{Counterfactual Experiments}
+
+Not currently available. 
+
+\section{Conclusion}
+
+Not currently available. 
+
+\newpage
+\singlespacing
+\nocite{*}
+%\bibliographystyle{econometrica}
+\bibliographystyle{cje}
+
+\bibliography{ma_template}\addcontentsline{toc}{section}{References}
+
+
+\end{document}
