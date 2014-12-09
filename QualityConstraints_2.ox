@@ -112,13 +112,13 @@ SetDelta(0.95);
 
      PD = new EmpiricalMoments("data",Emax,UseLabel);
 	 PD->TrackingWithLabel(AllFixed,UseLabel,Credits,attend,Sch_loans, work);
-     PD->TrackingWithLabel(AllFixed,NotInData,HC,GrowUp,savings,SchoolType);
+     PD->TrackingWithLabel(AllFixed,NotInData,HC,GrowUp,savings, SchoolType);
      PD->Read("Quality_Moments.dta");
 	 Emax -> Solve();
 	 PD -> Predict(TMax);
 	 PD->Histogram(Two);
 	 println("%c",PD.tlabels,PD.flat[0]);
-	 Explore(PD, 10, Omega,Beta_1);
+	 Explore(PD, 10, Omega_1,Beta_1, Phi);
 	delete PD;
 }
 
@@ -198,19 +198,20 @@ QualityConstraints_2::Reachable() {
 
 //     Now RandomUpDown always takes 3 prob.
 	if(!GROWNUp.v){
-    HC_u = (FeasA[][attend.pos].==1).*(phi[SchHCInt] + phi[SchAbil]*CV(Abil) + phi[SchHCType1]*(SchoolType.v==1) + phi[SchHCType2]*(SchoolType.v==2) + phi[SchHCType3]*(SchoolType.v==3) + phi[SchHCType4]*(SchoolType.v==4));
-    HC_n = (FeasA[][attend.pos].==1).*(phi_2[SchHCNCInt] + phi_2[SchNCAbil]*CV(Abil) + phi_2[SchHCNCType1]*(SchoolType.v==1) + phi_2[SchHCNCType2]*(SchoolType.v==2) + phi_2[SchHCNCType3]*(SchoolType.v==3) + phi_2[SchHCNCType4]*(SchoolType.v==4));;																										   
-	HC_up = exp(HC_u)./(1+exp(HC_u + HC_n));
-	HC_nc = exp(HC_n)./(1+exp(HC_u + HC_n));
+    HC_u = (phi[SchHCInt] + phi[SchAbil]*CV(Abil) + (FeasA[][attend.pos].==1).*phi[SchHCType1]*(SchoolType.v==1) + (FeasA[][attend.pos].==1).*phi[SchHCType2]*(SchoolType.v==2) + (FeasA[][attend.pos].==1).*phi[SchHCType3]*(SchoolType.v==3) + (FeasA[][attend.pos].==1).*phi[SchHCType4]*(SchoolType.v==4));
+    HC_n = (phi_2[SchHCNCInt] + phi_2[SchNCAbil]*CV(Abil) + (FeasA[][attend.pos].==1).*phi_2[SchHCNCType1]*(SchoolType.v==1) + (FeasA[][attend.pos].==1).*phi_2[SchHCNCType2]*(SchoolType.v==2) + (FeasA[][attend.pos].==1).*phi_2[SchHCNCType3]*(SchoolType.v==3) + (FeasA[][attend.pos].==1).*phi_2[SchHCNCType4]*(SchoolType.v==4));;																										   
+	HC_up = exp(HC_u)./(1+exp(HC_u) + exp(HC_n));
+	HC_nc = exp(HC_n)./(1+exp(HC_u) + exp(HC_n));
 	}
 	else{
     HC_u = phi_1[WrkHCInt] + phi_1[WrkHCPT]*(FeasA[][work.pos].==1)  + phi_1[WrkHCNCFT]*(FeasA[][work.pos].==2);
     HC_n = phi_3[WrkHCNCInt] + phi_3[WrkHCNCPT]*(FeasA[][work.pos].==1) + phi_3[WrkHCNCFT]*(FeasA[][work.pos].==2);
-	HC_up = exp(HC_u)./(1+exp(HC_u + HC_n));
-	HC_nc = exp(HC_n)./(1+exp(HC_u + HC_n));
+	HC_up = exp(HC_u)./(1+exp(HC_u) + exp(HC_n));
+	HC_nc = exp(HC_n)./(1+exp(HC_u) + exp(HC_n));
 	}
-    HC_down = 1 - HC_up - HC_nc;
-//	println(HC_down~HC_nc~HC_up);
+    HC_down = (1)./(1 + exp(HC_u) + exp(HC_nc));
+//	HC_down = 1 - HC_up - HC_nc;
+	if (any(HC_down~HC_nc~HC_up .< 0)) println(HC_down~HC_nc~HC_up);
 	if (any(HC_down~HC_nc~HC_up .< 0)) oxrunerror("HC probs. invalid");
      return HC_down~HC_nc~HC_up;
 }
