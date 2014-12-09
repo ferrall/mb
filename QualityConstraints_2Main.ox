@@ -1,4 +1,4 @@
-#include "QualityConstraints_2.ox"
+#import "QualityConstraints_2"
 
 main() {
 	 QualityConstraints_2::Replicate();

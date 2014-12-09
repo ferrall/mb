@@ -1,4 +1,4 @@
-#include "QualityConstraints_2.h"
+#import "QualityConstraints_2.h"
 
 QualityConstraints_2::Replicate(){
 
