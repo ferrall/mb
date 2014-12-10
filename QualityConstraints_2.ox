@@ -107,33 +107,18 @@ SetDelta(0.95);
 	CreateSpaces();
 	
 	decl Emax = new ValueIteration();
-//	data = new CollegeData(Emax);
-//	 AuxiliaryOutcomes(wage);
      PD = new EmpiricalMoments("data",Emax,UseLabel);
-	 PD->TrackingWithLabel(AllFixed,UseLabel,Credits,attend,Sch_loans, work, auxwage, auxgrants, auxtransfers);
+	 PD->TrackingWithLabel(AllFixed,UseLabel,Credits,attend,Sch_loans, work); // auxwage, auxgrants, auxtransfers);
      PD->TrackingWithLabel(AllFixed,NotInData,HC,GrowUp,savings, SchoolType);
      PD->Read("Quality_Moments.dta");
 	 Emax -> Solve();
 	 PD -> Predict(TMax);
-	 PD->Histogram(Two);
+	 PD -> Histogram(Two);
 	 println("%c",PD.tlabels,PD.flat[0]);
 	 Explore(PD, 10, Omega_1,Beta_1, Phi);
 	delete PD;
 }
 
-	
-//QualityConstraints_2::AuxiliaryOutcomes(wage)
-
-/** Read in the data.**/
-/*
-CollegeData::CollegeData(method) {
-	DataSet("Quality",method,FALSE);
-//	Observed(UseLabel);
-//	AuxiliaryOutcomes(wage);	 //Need to add parental transfers to Auxiliary
-	IDColumn("ID_97");
-	Read("Quality_Constraints.dta",TRUE);	
-	}
- */ 
 /**CONSTRAINTS ON CHOICE:**/
 QualityConstraints_2::FeasibleActions(const Alpha) {
 	
