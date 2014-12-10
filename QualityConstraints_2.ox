@@ -1,4 +1,4 @@
-#import "QualityConstraints_2.h"
+#include "QualityConstraints_2.h"
 
 QualityConstraints_2::Replicate(){
 
@@ -94,24 +94,23 @@ SetDelta(0.95);
 	GroupVariables(
 		Abil = new FixedEffect("abil", 1),
 		Race = new FixedEffect("race", 1),
-//		Score = new FixedEffect("score", 1), 	//MScorelabel
-//		Wealth = new FixedEffect("wealth", 1),	//MWealthlabel
 		Inc = new FixedEffect("income", 1), 		//MInclabel
 		Nsib = new FixedEffect("nsib", 1)	//sibling in college or not. 
 			   );
 			   
-//		auxwage =  new AuxiliaryVariable("wage");
-//		auxtransfer = new AuxiliaryVariable("transfers");
-//		AuxiliaryOutcomes(auxwage);
+		auxwage =  new AuxiliaryValues("wage");
+		auxgrants = new AuxiliaryValues("grants"); 
+		auxtransfers = new AuxiliaryValues("transfers");
+		AuxiliaryOutcomes(auxwage, auxgrants, auxtransfers);
 			   
 //	Volume = LOUD;
 	CreateSpaces();
 	
 	decl Emax = new ValueIteration();
 //	data = new CollegeData(Emax);
-
+//	 AuxiliaryOutcomes(wage);
      PD = new EmpiricalMoments("data",Emax,UseLabel);
-	 PD->TrackingWithLabel(AllFixed,UseLabel,Credits,attend,Sch_loans, work);
+	 PD->TrackingWithLabel(AllFixed,UseLabel,Credits,attend,Sch_loans, work, auxwage, auxgrants, auxtransfers);
      PD->TrackingWithLabel(AllFixed,NotInData,HC,GrowUp,savings, SchoolType);
      PD->Read("Quality_Moments.dta");
 	 Emax -> Solve();

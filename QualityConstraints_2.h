@@ -120,6 +120,8 @@ struct QualityConstraints_2 : ExtremeValue	{	 //ExpostSmoothing just copied from
 											leisure,
 											xper,											
 											auxwage,
+											auxgrants,
+											auxtransfers,
 											IntRates,
 											ElitePri,
 											Gamma,
