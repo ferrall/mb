@@ -1,0 +1,6 @@
+rm -f Quality_Constraints_2.out
+rm -f Quality_Constraints_2Main.oxo
+
+oxl -c QualityConstraints_2Main.ox
+
+sqsub -r 1h -o Quality_Constraints_2.out oxl -DMPI Quality_Constraints_2Main.oxo
