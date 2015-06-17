@@ -3,7 +3,7 @@
 
 #import "niqlow"
 
-struct QualityConstraints_3 : ExtremeValue	{	 //ExpostSmoothing just copied from KW
+struct QualityConstraints_3 : ExPostSmoothing	{	 //ExpostSmoothing just copied from KW
 
 	decl InSubSample;  //sample
 	
