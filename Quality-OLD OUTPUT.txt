@@ -1,0 +1,555 @@
+1. CLOCK
+    6. Uncertain Longevity (finite horizon until last period which ends randomly)
+2. STATE VARIABLES
+              |eps                 |eta |theta                                    -clock        |gamma
+                w   eps0   eps1    s21  GROWN  Credi  Schoo  asset  Sch_l     HC      t     t'      r   abil   race  incom   nsib
+       s.N      3      3      3      1      2      5      5      5      3      3     22      2      1      4      2      1      2
+
+
+     Transition Categories (not counting placeholders and variables with N=1)
+                 NonRandom       Random   Coevolving    Augmented       Timing    Invariant
+     #Vars               1            3            0            7            0            3
+
+3. SIZE OF SPACES
+
+                       Number of Points
+    Exogenous(Epsilon)               27
+    SemiExogenous(Eta)                1
+     Endogenous(Theta)             2250
+                 Times               22
+         EV()Iterating             4500
+      ChoiceProb.track            49500
+  Random Groups(Gamma)                1
+   Fixed Groups(Gamma)               16
+       Total Untrimmed         21384000
+
+4. ACTION VARIABLES
+   Number of Distinct action vectors: 900
+         schoi  atten   work  savin  loans  GrowU
+    a.N      5      2      3      5      3      2
+
+-------------------- DP Model Summary ------------------------
+1. CLOCK
+    6. Uncertain Longevity (finite horizon until last period which ends randomly)
+2. STATE VARIABLES
+              |eps                 |eta |theta                                    -clock        |gamma
+                w   eps0   eps1    s21  GROWN  Credi  Schoo  asset  Sch_l     HC      t     t'      r   abil   race  incom   nsib
+       s.N      3      3      3      1      2      5      5      5      3      3     22      2      1      4      2      1      2
+
+
+     Transition Categories (not counting placeholders and variables with N=1)
+                 NonRandom       Random   Coevolving    Augmented       Timing    Invariant
+     #Vars               1            3            0            7            0            3
+
+3. SIZE OF SPACES
+
+                       Number of Points
+    Exogenous(Epsilon)               27
+    SemiExogenous(Eta)                1
+     Endogenous(Theta)             2250
+                 Times               22
+         EV()Iterating             4500
+      ChoiceProb.track            49500
+  Random Groups(Gamma)                1
+   Fixed Groups(Gamma)               16
+       Total Untrimmed         21384000
+
+4. ACTION VARIABLES
+   Number of Distinct action vectors: 900
+         schoi  atten   work  savin  loans  GrowU
+    a.N      5      2      3      5      3      2
+
+5. TRIMMING AND SUBSAMPLING OF THE ENDOGENOUS STATE SPACE (Theta)
+                             N
+    TotalReachable       11268
+         Terminal            0
+     Approximated            0
+    tfirsts (t=0..T)         0
+                             3
+                           498
+                          1218
+                          2163
+                          3333
+                          4503
+                          5673
+                          6843
+                          8013
+                          9183
+                         10353
+                         10443
+                         10533
+                         10623
+                         10713
+                         10803
+                         10893
+                         10983
+                         11073
+                         11163
+                         11178
+                         11268
+
+6. FEASIBLE ACTION SETS
+ 
+    alpha       A[0]     A[1]     A[2]     A[3]     A[4]   
+    ----------------------------------------------------------
+    (000000)      X        -        -        X        -    
+    (100000)      X        -        -        -        X    
+    (200000)      X        -        -        -        X    
+    (300000)      X        -        -        -        X    
+    (400000)      X        -        -        -        X    
+    (010000)      X        -        -        X        -    
+    (001000)      X        -        -        X        -    
+    (011000)      X        -        -        X        -    
+    (002000)      X        -        -        X        -    
+    (012000)      X        -        -        X        -    
+    (010010)      X        -        -        X        -    
+    (011010)      X        -        -        X        -    
+    (012010)      X        -        -        X        -    
+    (010020)      X        -        -        X        -    
+    (011020)      X        -        -        X        -    
+    (012020)      X        -        -        X        -    
+    (000001)      X        X        X        X        X    
+    (010001)      X        -        X        X        -    
+    (001001)      X        X        X        X        -    
+    (011001)      X        -        X        X        -    
+    (002001)      X        X        X        X        -    
+    (012001)      X        -        X        X        -    
+    (000101)      X        X        -        -        -    
+    (001101)      X        X        -        -        -    
+    (002101)      X        X        -        -        -    
+    (000201)      X        X        -        -        -    
+    (001201)      X        X        -        -        -    
+    (002201)      X        X        -        -        -    
+    (000301)      X        X        -        -        -    
+    (001301)      X        X        -        -        -    
+    (002301)      X        X        -        -        -    
+    (000401)      X        X        -        -        -    
+    (001401)      X        X        -        -        -    
+    (002401)      X        X        -        -        -    
+    (010011)      X        -        X        X        -    
+    (011011)      X        -        X        X        -    
+    (012011)      X        -        X        X        -    
+    (010021)      X        -        X        X        -    
+    (011021)      X        -        X        X        -    
+    (012021)      X        -        X        X        -    
+   #States        0      915     1575     8775        3
+    ----------------------------------------------------------
+    Key: X = row vector is feasible. - = infeasible
+    Actions vectors not shown because they are never feasible: 860
+excluded some moments for fixed variable out of current range. Fixed variable: 2 # of values: 1
+Moments of Moments Read in for fixed group 
+       0.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000      0.28693      0.26896       0.0000      0.86957
+       13.000     0.075937     0.078947       0.0000      0.33333
+       13.000     0.024003     0.022575       0.0000     0.055435
+       13.000      0.65296     0.060606      0.50000      0.73276
+Moments of Moments Read in for fixed group 
+       8.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000       3.1756       2.4625       0.0000       6.6667
+       13.000      0.16670      0.17751       0.0000      0.53333
+       13.000      0.55667      0.46931       0.0000       1.3867
+       13.000      0.75253      0.12664      0.53333       1.0000
+Moments of Moments Read in for fixed group 
+       4.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000      0.44046      0.37178       0.0000       1.0227
+       13.000     0.080978     0.040429       0.0000      0.16667
+       13.000      0.48806      0.51791       0.0000       1.8687
+       13.000      0.53070      0.10071      0.33333      0.65789
+Moments of Moments Read in for fixed group 
+       12.000
+
+  sample size         mean      st.dev.          min          max
+       13.000       1.9547       1.5398       0.0000       4.2963
+       13.000      0.15682      0.10335       0.0000      0.32432
+       13.000      0.48456      0.30936       0.0000       1.1538
+       13.000      0.73754      0.10466      0.55405       1.0000
+Moments of Moments Read in for fixed group 
+       1.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000       1.6409       1.0417       0.0000       2.7049
+       13.000      0.12405     0.097597       0.0000      0.30000
+       13.000      0.65915      0.37362       0.0000       1.4286
+       13.000      0.65728     0.064458      0.52941      0.76087
+Moments of Moments Read in for fixed group 
+       9.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000       3.2005       2.0423       0.0000       5.2903
+       13.000      0.18370      0.16270       0.0000      0.51515
+       13.000      0.78418      0.39018       0.0000       1.1636
+       13.000      0.73626     0.082615      0.63636      0.92857
+   #States        0      915     1575     8775        3
+    ----------------------------------------------------------
+    Key: X = row vector is feasible. - = infeasible
+    Actions vectors not shown because they are never feasible: 860
+
+Moments of Moments Read in for fixed group 
+       5.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000       1.9588       1.4337       0.0000       4.3226
+       13.000      0.15584     0.092943       0.0000      0.28846
+       13.000      0.44143      0.26513       0.0000      0.93871
+       13.000      0.66686     0.074410      0.50943      0.81579
+Moments of Moments Read in for fixed group 
+       13.000
+
+  sample size         mean      st.dev.          min          max
+       13.000       3.5074       2.4184       0.0000       6.7407
+       13.000      0.21293      0.18146       0.0000      0.48148
+       13.000       1.9530      0.80165       0.0000       3.1500
+       13.000      0.62779      0.13984      0.44444       1.0000
+Moments of Moments Read in for fixed group 
+       2.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000       2.4087       1.7395       0.0000       5.0000
+       13.000      0.15704     0.089875       0.0000      0.33766
+       13.000       1.6812      0.72450       0.0000       2.7196
+       13.000      0.71311     0.066635      0.55769      0.81818
+Moments of Moments Read in for fixed group 
+       10.000
+
+  sample size         mean      st.dev.          min          max
+       13.000       6.8112       4.6578       0.0000       13.577
+       13.000      0.26275      0.19331       0.0000      0.61111
+       13.000       3.5059       1.5011       0.0000       5.9214
+       13.000      0.71775     0.084234      0.53704      0.88235
+Moments of Moments Read in for fixed group 
+       6.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000       1.8540       1.6116       0.0000       4.6923
+       13.000      0.12163      0.10104       0.0000      0.30769
+       13.000     0.051099     0.093325       0.0000      0.22500
+       13.000      0.49671      0.15838      0.34091       1.0000
+Moments of Moments Read in for fixed group 
+       14.000
+
+  sample size         mean      st.dev.          min          max
+       13.000       6.9486       4.4260       0.0000       12.059
+       13.000      0.34852      0.25768       0.0000      0.77273
+       13.000       1.2792      0.81697       0.0000       3.0250
+       13.000      0.67328      0.23463       0.0000      0.91176
+Moments of Moments Read in for fixed group 
+       3.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000       4.8524       3.2090       0.0000       9.5833
+       13.000      0.19489      0.17716       0.0000      0.56000
+       13.000       1.1560      0.70163       0.0000       2.9066
+       13.000      0.68510     0.071503      0.54902      0.78571
+Moments of Moments Read in for fixed group 
+       11.000
+
+  sample size         mean      st.dev.          min          max
+       13.000       9.2256       6.0033       0.0000       15.089
+       13.000      0.27904      0.29369       0.0000      0.75000
+       13.000       3.7521       2.3395       0.0000       10.900
+       13.000      0.66715      0.14214      0.40132      0.83065
+Moments of Moments Read in for fixed group 
+       7.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000       4.9423       3.2406       0.0000       10.000
+       13.000      0.16923      0.16530       0.0000      0.50000
+       13.000       1.2500       1.7421       0.0000       6.2500
+       13.000      0.70577      0.27305       0.0000       1.0000
+Moments of Moments Read in for fixed group 
+       15.000
+
+  sample size         mean      st.dev.          min          max
+       13.000       6.8122       4.7006       0.0000       12.667
+       13.000      0.23077      0.23250       0.0000      0.55556
+       13.000       4.0099       3.2162       0.0000       13.200
+       13.000      0.62115      0.14654      0.38889       1.0000
+excluded some moments for fixed variable out of current range. Fixed variable: 2 # of values: 1
+Moments of Moments Read in for fixed group 
+       0.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000      0.28693      0.26896       0.0000      0.86957
+       13.000     0.075937     0.078947       0.0000      0.33333
+       13.000     0.024003     0.022575       0.0000     0.055435
+       13.000      0.65296     0.060606      0.50000      0.73276
+Moments of Moments Read in for fixed group 
+       8.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000       3.1756       2.4625       0.0000       6.6667
+       13.000      0.16670      0.17751       0.0000      0.53333
+       13.000      0.55667      0.46931       0.0000       1.3867
+       13.000      0.75253      0.12664      0.53333       1.0000
+Moments of Moments Read in for fixed group 
+       4.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000      0.44046      0.37178       0.0000       1.0227
+       13.000     0.080978     0.040429       0.0000      0.16667
+       13.000      0.48806      0.51791       0.0000       1.8687
+       13.000      0.53070      0.10071      0.33333      0.65789
+Moments of Moments Read in for fixed group 
+       12.000
+
+  sample size         mean      st.dev.          min          max
+       13.000       1.9547       1.5398       0.0000       4.2963
+       13.000      0.15682      0.10335       0.0000      0.32432
+       13.000      0.48456      0.30936       0.0000       1.1538
+       13.000      0.73754      0.10466      0.55405       1.0000
+Moments of Moments Read in for fixed group 
+       1.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000       1.6409       1.0417       0.0000       2.7049
+       13.000      0.12405     0.097597       0.0000      0.30000
+       13.000      0.65915      0.37362       0.0000       1.4286
+       13.000      0.65728     0.064458      0.52941      0.76087
+Moments of Moments Read in for fixed group 
+       9.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000       3.2005       2.0423       0.0000       5.2903
+       13.000      0.18370      0.16270       0.0000      0.51515
+       13.000      0.78418      0.39018       0.0000       1.1636
+       13.000      0.73626     0.082615      0.63636      0.92857
+Moments of Moments Read in for fixed group 
+       5.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000       1.9588       1.4337       0.0000       4.3226
+       13.000      0.15584     0.092943       0.0000      0.28846
+       13.000      0.44143      0.26513       0.0000      0.93871
+       13.000      0.66686     0.074410      0.50943      0.81579
+Moments of Moments Read in for fixed group 
+       13.000
+
+  sample size         mean      st.dev.          min          max
+       13.000       3.5074       2.4184       0.0000       6.7407
+       13.000      0.21293      0.18146       0.0000      0.48148
+       13.000       1.9530      0.80165       0.0000       3.1500
+       13.000      0.62779      0.13984      0.44444       1.0000
+Moments of Moments Read in for fixed group 
+       2.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000       2.4087       1.7395       0.0000       5.0000
+       13.000      0.15704     0.089875       0.0000      0.33766
+       13.000       1.6812      0.72450       0.0000       2.7196
+       13.000      0.71311     0.066635      0.55769      0.81818
+Moments of Moments Read in for fixed group 
+       10.000
+
+  sample size         mean      st.dev.          min          max
+       13.000       6.8112       4.6578       0.0000       13.577
+       13.000      0.26275      0.19331       0.0000      0.61111
+       13.000       3.5059       1.5011       0.0000       5.9214
+       13.000      0.71775     0.084234      0.53704      0.88235
+Moments of Moments Read in for fixed group 
+       6.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000       1.8540       1.6116       0.0000       4.6923
+       13.000      0.12163      0.10104       0.0000      0.30769
+       13.000     0.051099     0.093325       0.0000      0.22500
+       13.000      0.49671      0.15838      0.34091       1.0000
+Moments of Moments Read in for fixed group 
+       14.000
+
+  sample size         mean      st.dev.          min          max
+       13.000       6.9486       4.4260       0.0000       12.059
+       13.000      0.34852      0.25768       0.0000      0.77273
+       13.000       1.2792      0.81697       0.0000       3.0250
+       13.000      0.67328      0.23463       0.0000      0.91176
+Moments of Moments Read in for fixed group 
+       3.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000       4.8524       3.2090       0.0000       9.5833
+       13.000      0.19489      0.17716       0.0000      0.56000
+       13.000       1.1560      0.70163       0.0000       2.9066
+       13.000      0.68510     0.071503      0.54902      0.78571
+Moments of Moments Read in for fixed group 
+       11.000
+
+  sample size         mean      st.dev.          min          max
+       13.000       9.2256       6.0033       0.0000       15.089
+       13.000      0.27904      0.29369       0.0000      0.75000
+       13.000       3.7521       2.3395       0.0000       10.900
+       13.000      0.66715      0.14214      0.40132      0.83065
+Moments of Moments Read in for fixed group 
+       7.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000       4.9423       3.2406       0.0000       10.000
+       13.000      0.16923      0.16530       0.0000      0.50000
+       13.000       1.2500       1.7421       0.0000       6.2500
+       13.000      0.70577      0.27305       0.0000       1.0000
+Moments of Moments Read in for fixed group 
+       15.000
+
+  sample size         mean      st.dev.          min          max
+       13.000       6.8122       4.7006       0.0000       12.667
+       13.000      0.23077      0.23250       0.0000      0.55556
+       13.000       4.0099       3.2162       0.0000       13.200
+       13.000      0.62115      0.14654      0.38889       1.0000
+excluded some moments for fixed variable out of current range. Fixed variable: 2 # of values: 1
+Moments of Moments Read in for fixed group 
+       0.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000      0.28693      0.26896       0.0000      0.86957
+       13.000     0.075937     0.078947       0.0000      0.33333
+       13.000     0.024003     0.022575       0.0000     0.055435
+       13.000      0.65296     0.060606      0.50000      0.73276
+Moments of Moments Read in for fixed group 
+       8.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000       3.1756       2.4625       0.0000       6.6667
+       13.000      0.16670      0.17751       0.0000      0.53333
+       13.000      0.55667      0.46931       0.0000       1.3867
+       13.000      0.75253      0.12664      0.53333       1.0000
+Moments of Moments Read in for fixed group 
+       4.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000      0.44046      0.37178       0.0000       1.0227
+       13.000     0.080978     0.040429       0.0000      0.16667
+       13.000      0.48806      0.51791       0.0000       1.8687
+       13.000      0.53070      0.10071      0.33333      0.65789
+Moments of Moments Read in for fixed group 
+       12.000
+
+  sample size         mean      st.dev.          min          max
+       13.000       1.9547       1.5398       0.0000       4.2963
+       13.000      0.15682      0.10335       0.0000      0.32432
+       13.000      0.48456      0.30936       0.0000       1.1538
+       13.000      0.73754      0.10466      0.55405       1.0000
+Moments of Moments Read in for fixed group 
+       1.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000       1.6409       1.0417       0.0000       2.7049
+       13.000      0.12405     0.097597       0.0000      0.30000
+       13.000      0.65915      0.37362       0.0000       1.4286
+       13.000      0.65728     0.064458      0.52941      0.76087
+Moments of Moments Read in for fixed group 
+       9.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000       3.2005       2.0423       0.0000       5.2903
+       13.000      0.18370      0.16270       0.0000      0.51515
+       13.000      0.78418      0.39018       0.0000       1.1636
+       13.000      0.73626     0.082615      0.63636      0.92857
+Moments of Moments Read in for fixed group 
+       5.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000       1.9588       1.4337       0.0000       4.3226
+       13.000      0.15584     0.092943       0.0000      0.28846
+       13.000      0.44143      0.26513       0.0000      0.93871
+       13.000      0.66686     0.074410      0.50943      0.81579
+Moments of Moments Read in for fixed group 
+       13.000
+
+  sample size         mean      st.dev.          min          max
+       13.000       3.5074       2.4184       0.0000       6.7407
+       13.000      0.21293      0.18146       0.0000      0.48148
+       13.000       1.9530      0.80165       0.0000       3.1500
+       13.000      0.62779      0.13984      0.44444       1.0000
+Moments of Moments Read in for fixed group 
+       2.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000       2.4087       1.7395       0.0000       5.0000
+       13.000      0.15704     0.089875       0.0000      0.33766
+       13.000       1.6812      0.72450       0.0000       2.7196
+       13.000      0.71311     0.066635      0.55769      0.81818
+Moments of Moments Read in for fixed group 
+       10.000
+
+  sample size         mean      st.dev.          min          max
+       13.000       6.8112       4.6578       0.0000       13.577
+       13.000      0.26275      0.19331       0.0000      0.61111
+       13.000       3.5059       1.5011       0.0000       5.9214
+       13.000      0.71775     0.084234      0.53704      0.88235
+Moments of Moments Read in for fixed group 
+       6.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000       1.8540       1.6116       0.0000       4.6923
+       13.000      0.12163      0.10104       0.0000      0.30769
+       13.000     0.051099     0.093325       0.0000      0.22500
+       13.000      0.49671      0.15838      0.34091       1.0000
+Moments of Moments Read in for fixed group 
+       14.000
+
+  sample size         mean      st.dev.          min          max
+       13.000       6.9486       4.4260       0.0000       12.059
+       13.000      0.34852      0.25768       0.0000      0.77273
+       13.000       1.2792      0.81697       0.0000       3.0250
+       13.000      0.67328      0.23463       0.0000      0.91176
+Moments of Moments Read in for fixed group 
+       3.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000       4.8524       3.2090       0.0000       9.5833
+       13.000      0.19489      0.17716       0.0000      0.56000
+       13.000       1.1560      0.70163       0.0000       2.9066
+       13.000      0.68510     0.071503      0.54902      0.78571
+Moments of Moments Read in for fixed group 
+       11.000
+
+  sample size         mean      st.dev.          min          max
+       13.000       9.2256       6.0033       0.0000       15.089
+       13.000      0.27904      0.29369       0.0000      0.75000
+       13.000       3.7521       2.3395       0.0000       10.900
+       13.000      0.66715      0.14214      0.40132      0.83065
+Moments of Moments Read in for fixed group 
+       7.0000
+
+  sample size         mean      st.dev.          min          max
+       13.000       4.9423       3.2406       0.0000       10.000
+       13.000      0.16923      0.16530       0.0000      0.50000
+       13.000       1.2500       1.7421       0.0000       6.2500
+       13.000      0.70577      0.27305       0.0000       1.0000
+Moments of Moments Read in for fixed group 
+       15.000
+
+  sample size         mean      st.dev.          min          max
+       13.000       6.8122       4.7006       0.0000       12.667
+       13.000      0.23077      0.23250       0.0000      0.55556
+       13.000       4.0099       3.2162       0.0000       13.200
+       13.000      0.62115      0.14654      0.38889       1.0000
+
+       f       t Credits  attendSch_loans    work      HC  GrowUp savings
+  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.2881  0.0000
+  0.0000  1.0000  0.4433  0.0000  0.0000  0.0000  0.3732  0.0000  0.0000
+  0.0000  2.0000  0.3895  0.1798  0.4561  0.0000  0.6298  0.7594  1.1388
+  0.0000  3.0000  0.2882  0.0912  0.2441  0.0000  0.7761  0.8329  1.4800
+  0.0000  4.0000  0.1888  0.0457  0.1240  0.0000  0.8565  0.8566  1.6222
+  0.0000  5.0000  0.1141  0.0227  0.0621  0.0000  0.8971  0.8561  1.6678
+  0.0000  6.0000  0.0648  0.0112  0.0309  0.0000  0.9133  0.8442  1.6667
+  0.0000  7.0000  0.0351  0.0055  0.0153  0.0000  0.9145  0.8270  1.6434
+  0.0000  8.0000  0.0184  0.0027  0.0075  0.0000  0.9065  0.8076  1.6099
+  0.0000  9.0000  0.0094  0.0013  0.0037  0.0000  0.8929  0.7873  1.5720
+  0.0000 10.0000  0.0047  0.0007  0.0018  0.0000  0.8759  0.7675  1.5325
+  0.0000 11.0000  0.0000  0.0000  0.0009  0.0000  0.8569  0.7470  1.4940
+  0.0000 12.0000  0.0000  0.0000  0.0000  0.0000  0.8369  0.7270  1.4541
+  0.0000 13.0000  0.0000  0.0000  0.0000  0.0000  0.8164  0.7076  1.4152
+  0.0000 14.0000  0.0000  0.0000  0.0000  0.0000  0.7958  0.6887  1.3774
+  0.0000 15.0000  0.0000  0.0000  0.0000  0.0000  0.7753  0.6703  1.3406
+  0.0000 16.0000  0.0000  0.0000  0.0000  0.0000  0.7551  0.6524  1.3048
+  0.0000 17.0000  0.0000  0.0000  0.0000  0.0000  0.7353  0.6350  1.2699
+  0.0000 18.0000  0.0000  0.0000  0.0000  0.0000  0.7158  0.6180  1.2360
+  0.0000 19.0000  0.0000  0.0000  0.0000  0.0000  0.6969  0.6015  1.2030
+  0.0000 20.0000  0.0000  0.0000  0.0000  0.0000  0.6783  0.5854  1.1708
+  0.0000 21.0000  0.0000  0.0000  0.0000  0.0000  0.6603  0.5698  1.1396
+  0.0000 22.0000  0.0000  0.0000  0.0000  0.0000  0.6427  0.0000  0.0000

@@ -4,7 +4,8 @@ QualityConstraints_3::Replicate(){
 
 decl KW, PD, PS;
 
-Initialize(1.0,Reachable, FALSE, 0);			//For experiment
+//Initialize(1.0,Reachable, FALSE, 0);			//For experiment
+Initialize(QualityConstraints_3::Reachable, TRUE);
 SetClock(UncertainLongevity,TMax,0.0);
 //SetClock(NormalAging,TMax);
 SetDelta(0.95);
@@ -87,7 +88,7 @@ SetDelta(0.95);
 	GroupVariables(					
 		Abil = new FixedEffect("abil", 4),
 		Race = new FixedEffect("race", 2),
-		Inc = new FixedEffect("income", 3), 		//MInclabel
+		Inc = new FixedEffect("income", 1), 		//MInclabel
 		Nsib = new FixedEffect("nsib", 2)	//sibling in college or not. 
 			   );
 			   
@@ -102,6 +103,7 @@ SetDelta(0.95);
 //	data = new CollegeData(Emax);
 
      PD = new EmpiricalMoments("data",Emax,UseLabel);
+	 PD.Volume = QUIET;
 	 PD->TrackingWithLabel(AllFixed,UseLabel,Credits,attend,Sch_loans, work);
      PD->TrackingWithLabel(AllFixed,NotInData,HC,GrowUp,savings);
      PD->Read("Quality_Moments.dta");
@@ -109,7 +111,7 @@ SetDelta(0.95);
 	 PD -> Predict(TMax);
 	 PD-> Histogram(Two);
 	 println("%c",PD.tlabels,PD.flat[0]);
-//	 Explore(PD, 0, Omega_1,Beta_1, Phi);
+	 Explore(PD, 0, Omega_1,Beta_1, Phi);
 	delete PD;
 }
 
@@ -129,7 +131,7 @@ CollegeData::CollegeData(method) {
 /**CONSTRAINTS ON CHOICE:**/
 QualityConstraints_3::FeasibleActions(const Alpha) {
 	
-	decl Age = curt + Age0, A;
+	decl Age = I::t + Age0, A;
 
 	//Need to clean up below: Basically -> if school choice is 0, you have to grow up in the initial period. 
 	if (Age == Age0) return (!Alpha[][attend.pos] .* !Alpha[][work.pos] .* !Alpha[][savings.pos].* !Alpha[][borrow.pos])
@@ -140,7 +142,7 @@ QualityConstraints_3::FeasibleActions(const Alpha) {
 //	A = !( CV(GROWNUp) + Alpha[][schoice.pos] )            //After t=0, no choice
 //		+ CV(GROWNUp).*(Alpha[][schoice.pos].==Forgotten|| !Alpha[][attend.pos]); //After GROWNUp, no choice, but forgotten state
 
-	if (curt >= MaxTAtt) A .*= (Alpha[][GrowUp.pos]);  	/*Must grow up at certain age*/
+	if (I::t >= MaxTAtt) A .*= (Alpha[][GrowUp.pos]);  	/*Must grow up at certain age*/
 
 	if (CV(GROWNUp) == 1) {
 		A .*= (Alpha[][GrowUp.pos].==Older); 
@@ -152,14 +154,14 @@ QualityConstraints_3::FeasibleActions(const Alpha) {
 		A .*= 1 - (!Alpha[][attend.pos]).*!(!Alpha[][borrow.pos]);
 		}
 
-//	if (curt >= TMax-2) A.*= (Alpha[][work.pos].==FullWork); //work full-time only
+//	if (I::t >= TMax-2) A.*= (Alpha[][work.pos].==FullWork); //work full-time only
 	
 	return A;
 	}
 
 QualityConstraints_3::Reachable() {
 
-	if (curt == 0) {
+	if (I::t == 0) {
 			if (CV(GROWNUp) || !(CV(Sch_loans)==0) || !(CV(asset)==0) || !(CV(Credits)==0) || !(CV(SchoolType)==0) ) return 0;
 			}
 			//cant be grown up in initial decision
@@ -169,15 +171,15 @@ QualityConstraints_3::Reachable() {
 			
 			
 	//first phase
-	if (CV(Credits) > curt) return 0;
+	if (CV(Credits) > I::t) return 0;
 			
-	if ( (curt > MaxTAtt || CV(GROWNUp) ) && ( CV(SchoolType)!=Forgotten || CV(Credits)!=Forgotten ) ) return 0;
+	if ( (I::t > MaxTAtt || CV(GROWNUp) ) && ( CV(SchoolType)!=Forgotten || CV(Credits)!=Forgotten ) ) return 0;
 
-	if (curt == TMax-2) {
+	if (I::t == TMax-2) {
 		if (CV(Sch_loans)||CV(Credits)||CV(SchoolType)||!CV(GROWNUp)) return 0; //forget student loans once older worker, the other two already forgotten.
 			}
 
-//	if (curt == TMax-1) return 0;  //never die
+//	if (I::t == TMax-1) return 0;  //never die
 	
 	return new QualityConstraints_3();
 	}
@@ -214,7 +216,7 @@ QualityConstraints_3::Cr_Transit(FeasA){
 	decl prob_fail, prob_pass, prob_p, prob_down;
 	decl theta = CV(Theta);
 
-	decl Age = curt + Age0;
+	decl Age = I::t + Age0;
 	
   	if(!CV(GROWNUp)){
 		decl ivals_work = FeasA[][work.pos], ivals_attend = FeasA[][attend.pos]; 
@@ -239,9 +241,9 @@ decl th = Settheta(I::all[tracking]);
 //Net savings for school loans
 QualityConstraints_3::Budget(FeasA) {
 	gross = net_tuition = n_loans = 0.0;
-	if (curt==0) return 0;
+	if (I::t==0) return 0;
 	
-	decl BA = 0, Age = Age0 + curt, sch_repayment;
+	decl BA = 0, Age = Age0 + I::t, sch_repayment;
 	decl stype = CV(SchoolType);
 	decl schloans = Sch_loans.actual[CV(Sch_loans)];	//getting values 
 	decl att1 = FeasA[][attend.pos], wrk1 = FeasA[][work.pos], sav1 = FeasA[][borrow.pos];
@@ -255,7 +257,7 @@ QualityConstraints_3::Budget(FeasA) {
 
 
 	/*Parental Transfers*/
-	transfers = (curt>=TMax-2) ? 0 : beta_1[AmTrnsInt] + beta_1[AmTrnsAtt]*att1 + beta_1[AmTrnsParInc]*CV(Inc);
+	transfers = (I::t>=TMax-2) ? 0 : beta_1[AmTrnsInt] + beta_1[AmTrnsAtt]*att1 + beta_1[AmTrnsParInc]*CV(Inc);
 	gross = AV(asset) + wage + transfers;
 
 	if(!CV(GROWNUp)){
@@ -268,8 +270,8 @@ QualityConstraints_3::Budget(FeasA) {
 		}
 	else {
 		net_tuition = 0.0;
-		if (curt>=TMax-3) return -schloans; //so if loans are > 0 when transitioning to old age, it goes to zero. 
-		sch_repayment = (schloans)/(1 - (1/(1+r1))^(TMax-2 - curt))/(1-(1/(1+r1))); //denominator is a geometric series
+		if (I::t>=TMax-3) return -schloans; //so if loans are > 0 when transitioning to old age, it goes to zero. 
+		sch_repayment = (schloans)/(1 - (1/(1+r1))^(TMax-2 - I::t))/(1-(1/(1+r1))); //denominator is a geometric series
 		n_loans = (gross .< sch_repayment) .? mu*schloans .: -sch_repayment;	//see if in default or not, choose the correct transition
 		return n_loans;
 		}
@@ -281,7 +283,7 @@ QualityConstraints_3::Savings(FeasA){
 	}
 
 QualityConstraints_3::Event() {
-	return (curt >= TMax-2);
+	return (I::t >= TMax-2);
 	}
 	
 	QualityConstraints_3::Utility() {
@@ -289,7 +291,7 @@ QualityConstraints_3::Event() {
 	decl gamma = CV(Gamma);
 	decl gamma_1 = CV(Gamma_1);
 
-	if (curt==TMax-1 || curt==0) return zeros(rows(A[Aind]),1);
+	if (I::t==TMax-1 || I::t==0) return zeros(rows(A[Aind]),1);
 
 	decl cons =	/*Consumption*/
 		//gross - net_tuition - n_loans - savings.actual[aa(savings)]' + borrow.actual[aa(borrow)]'; //not right?
