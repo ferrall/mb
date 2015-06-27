@@ -10,14 +10,13 @@ SetClock(UncertainLongevity,TMax,0.0);
 //SetClock(NormalAging,TMax);
 SetDelta(0.95);
 
-
 		Phi = new array[4];
 		Phi[0] = new Coefficients("Phi", <.20,.15,.02,.124,.15,.15>, MSchHCLabels);	//still problems with this?
 		Phi[1] = new Coefficients("Phi_1", <.15,.05,.07,.50,.08,.10,.20>, MWrkHCLabels);
         Phi[2] = new Coefficients("Phi_2", <.05,.1,.1,.12,.076,.11>, MSchNCHCLabels);
         Phi[3] = new Coefficients("Phi_3", <.085,.05,.07,.10,.08,.10,.05>, MWrkNCHCLabels);
 
-	/*	Gamma = new array[2];
+		Gamma = new array[2];
 		Gamma[0] = new Coefficients("Gamma", <0, -36.85, -150.6>, MSchUtilLabels);
 		Gamma[1] = new Coefficients("Gamma_1", <-16.32, 0, -2.645, -1.103, 2.164>, MWrkUtilLabels);
 
@@ -28,15 +27,9 @@ SetDelta(0.95);
 		Beta = new array[2];
 		Beta[0] = new Coefficients("Beta",	<0.0, 0.0, 0.0, 0.0>, MPrTrnsLabels);
 		Beta[1] = new Coefficients("Beta_1", <10.8,.1581,.0021,.0033>, MAmTrnsLabels);
-		
-	*/	
-		Gamma = new Coefficients("Gamma", <0, -36.85, -150.6>, MSchUtilLabels);
-		Gamma_1 = new Coefficients("Gamma_1", <-16.32, 0, -2.645, -1.103, 2.164>, MWrkUtilLabels);
-		Omega = new Coefficients("Omega", <325.2, 51.53>, MinEarnLabels);  //change to positive?
-	 	Omega_1 = new Coefficients("Omega_1", <2.9,0,-.0107, .067, 0.0, -0.22,0.0, 0.0, 0.0, 0.0>,MWageLabels);
-		Theta = new Coefficients("Theta", <.22, .1, .004, -.1, -.2>, MCreditLabels);
-   		Beta_1 = new Coefficients("Beta_1", <10.8,.0021,.0033>, MAmTrnsLabels);
+
 		Tau = new Coefficients("Tau", <-6097, 921.6, -34.7, 2234.4, 4366.2, 944.6, 4123.0, 0.0>, MGrantsLabels);
+		Theta = new Coefficients("Theta", <.22, .1, .004, -.1, -.2>, MCreditLabels);
 
 		dinterest = new array[MIntLabels];
 		dinterest[iborrow] = new Determined("iborrow", par[iborrow]);
@@ -67,12 +60,13 @@ SetDelta(0.95);
 
 	EndogenousStates(
 		GROWNUp = new PermanentChoice("GROWNUp", GrowUp),		
-		Credits=  new Forget(new RandomUpDown("Credits", MaxCredits, QualityConstraints_3::Cr_Transit),GROWNUp,Forgotten),
-		SchoolType = new Forget(new PermanentChoice("SchoolType", schoice),GROWNUp,Forgotten),
-		asset = new Asset("asset", MaxAssets, CV(dinterest[iborrow]), QualityConstraints_3::Savings),
-		Sch_loans = new Asset("Sch_loans", MaxScAssets, CV(dinterest[iunsub]), QualityConstraints_3::Loans),
-		HC = new Freeze(new RandomUpDown("HC", MaxHC, QualityConstraints_3::HC_trans), QualityConstraints_3::Event())		   //Event needs to be an age. 
+		Credits=  new Forget(new RandomUpDown("Credits", MaxCredits, Cr_Transit),GROWNUp,0),
+		SchoolType = new Forget(new PermanentChoice("SchoolType", schoice),GROWNUp,0),
+		asset = new Asset("asset", MaxAssets, CV(dinterest[iborrow]), Savings),
+		Sch_loans = new Asset("Sch_loans", MaxScAssets, CV(dinterest[iunsub]), Loans),
+		HC = new Freeze(new RandomUpDown("HC", MaxHC, HC_trans,FALSE), Event())
 					);
+
 	asset.actual = savings.actual;
 
 //EXOGENOUS STATES:
@@ -86,7 +80,7 @@ SetDelta(0.95);
  
 //Fixed Effects:
 	GroupVariables(					
-		Abil = new FixedEffect("abil", 4),
+		Abil = new FixedEffect("abil", 2),
 		Race = new FixedEffect("race", 2),
 		Inc = new FixedEffect("income", 1), 		//MInclabel
 		Nsib = new FixedEffect("nsib", 2)	//sibling in college or not. 
@@ -100,7 +94,6 @@ SetDelta(0.95);
 	CreateSpaces();
 	
 	decl Emax = new ValueIteration();
-//	data = new CollegeData(Emax);
 
      PD = new EmpiricalMoments("data",Emax,UseLabel);
 	 PD.Volume = QUIET;
@@ -111,56 +104,47 @@ SetDelta(0.95);
 	 PD -> Predict(TMax);
 	 PD-> Histogram(Two);
 	 println("%c",PD.tlabels,PD.flat[0]);
-	 Explore(PD, 0, Omega_1,Beta_1, Phi);
+//	 Explore(PD, 0, Omega_1,Beta_1, Phi);
 	delete PD;
 }
 
-	
-//QualityConstraints_2::AuxiliaryOutcomes(wage)
-
-/** Read in the data.**/
-/*
-CollegeData::CollegeData(method) {
-	DataSet("Quality",method,FALSE);
-//	Observed(UseLabel);
-//	AuxiliaryOutcomes(wage);	 //Need to add parental transfers to Auxiliary
-	IDColumn("ID_97");
-	Read("Quality_Constraints.dta",TRUE);	
-	}
- */ 
 /**CONSTRAINTS ON CHOICE:**/
 QualityConstraints_3::FeasibleActions(const Alpha) {
 	
 	decl Age = I::t + Age0, A;
 
-	//Need to clean up below: Basically -> if school choice is 0, you have to grow up in the initial period. 
-	if (Age == Age0) return (!Alpha[][attend.pos] .* !Alpha[][work.pos] .* !Alpha[][savings.pos].* !Alpha[][borrow.pos])
-							.*!(Alpha[][GrowUp.pos].*Alpha[][schoice.pos]).*(1 - (!Alpha[][GrowUp.pos].*!Alpha[][schoice.pos]));
-
+	if (I::t == 0) return (!Alpha[][attend.pos] .* !Alpha[][work.pos] .* !Alpha[][savings.pos].* !Alpha[][borrow.pos])
+			.*!(Alpha[][GrowUp.pos].*Alpha[][schoice.pos]).*(1 - (!Alpha[][GrowUp.pos].*!Alpha[][schoice.pos]));
+	
 	A = (Alpha[][schoice.pos].==0);
 
-//	A = !( CV(GROWNUp) + Alpha[][schoice.pos] )            //After t=0, no choice
-//		+ CV(GROWNUp).*(Alpha[][schoice.pos].==Forgotten|| !Alpha[][attend.pos]); //After GROWNUp, no choice, but forgotten state
-
-	if (I::t >= MaxTAtt) A .*= (Alpha[][GrowUp.pos]);  	/*Must grow up at certain age*/
-
+	if (I::t >= MaxTAtt){
+	A .*= (Alpha[][GrowUp.pos].==Older);  	/*Must grow up at certain age*/
+	}
+	
 	if (CV(GROWNUp) == 1) {
 		A .*= (Alpha[][GrowUp.pos].==Older); 
 		A .*= (Alpha[][attend.pos].==NoAttend);  	/*rule out school attendance when grownup = 0*/
-		A .*= (Alpha[][borrow.pos].==0);	/*would need to change if change grid points*/
+		A .*= (Alpha[][borrow.pos].==0); /*would need to change if change grid points*/
 		}
 	else{
 		A .*= (Alpha[][savings.pos].==0);	 /*Would need to change if i change the grid points for savings*/
-		A .*= 1 - (!Alpha[][attend.pos]).*!(!Alpha[][borrow.pos]);
+		A .*= 1 - (!Alpha[][attend.pos]).*!(!Alpha[][borrow.pos]); //can only borrow if going to school
+
+			if(I::t == 10) A.*=(Alpha[][GrowUp.pos].==Older); //If you have not grown up after 10 years in school, must grow grow up.
 		}
 
-//	if (I::t >= TMax-2) A.*= (Alpha[][work.pos].==FullWork); //work full-time only
+	if(I::t >= TMax-2){
+		A .*= (Alpha[][work.pos].==FullWork); /*Must work FT in stationary phase*/
+	}
 	
 	return A;
 	}
 
 QualityConstraints_3::Reachable() {
 
+
+	//Initial Choice Phase
 	if (I::t == 0) {
 			if (CV(GROWNUp) || !(CV(Sch_loans)==0) || !(CV(asset)==0) || !(CV(Credits)==0) || !(CV(SchoolType)==0) ) return 0;
 			}
@@ -170,26 +154,25 @@ QualityConstraints_3::Reachable() {
 			//Can't have assets in initial decision
 			
 			
-	//first phase
-	if (CV(Credits) > I::t) return 0;
-			
+	//Working Phase		
 	if ( (I::t > MaxTAtt || CV(GROWNUp) ) && ( CV(SchoolType)!=Forgotten || CV(Credits)!=Forgotten ) ) return 0;
 
-	if (I::t == TMax-2) {
+	//Mature Phase
+	if (I::t >= TMax-2) {
 		if (CV(Sch_loans)||CV(Credits)||CV(SchoolType)||!CV(GROWNUp)) return 0; //forget student loans once older worker, the other two already forgotten.
 			}
 
-//	if (I::t == TMax-1) return 0;  //never die
+	if (I::t == TMax-1) return 0;  //never die
 	
 	return new QualityConstraints_3();
 	}
 
-
+ 
  QualityConstraints_3::HC_trans(FeasA) {
+
      decl HC_u, HC_n, HC_up, HC_nc, HC_down;
 	 decl phi = CV(Phi[0]), phi_1 = CV(Phi[1]), phi_2 = CV(Phi[2]), phi_3 = CV(Phi[3]);
 
-//     Now RandomUpDown always takes 3 prob.
 	if(!GROWNUp.v){
     HC_u = (phi[SchHCInt] + phi[SchAbil]*CV(Abil) + (FeasA[][attend.pos].==1).*phi[SchHCType1]*(SchoolType.v==1) + (FeasA[][attend.pos].==1).*phi[SchHCType2]*(SchoolType.v==2) + (FeasA[][attend.pos].==1).*phi[SchHCType3]*(SchoolType.v==3) + (FeasA[][attend.pos].==1).*phi[SchHCType4]*(SchoolType.v==4));
     HC_n = (phi_2[SchHCNCInt] + phi_2[SchNCAbil]*CV(Abil) + (FeasA[][attend.pos].==1).*phi_2[SchHCNCType1]*(SchoolType.v==1) + (FeasA[][attend.pos].==1).*phi_2[SchHCNCType2]*(SchoolType.v==2) + (FeasA[][attend.pos].==1).*phi_2[SchHCNCType3]*(SchoolType.v==3) + (FeasA[][attend.pos].==1).*phi_2[SchHCNCType4]*(SchoolType.v==4));;																										   
@@ -203,7 +186,6 @@ QualityConstraints_3::Reachable() {
 	HC_nc = exp(HC_n)./(1+exp(HC_u) + exp(HC_n));
 	}
     HC_down = (1)./(1 + exp(HC_u) + exp(HC_nc));
-//	HC_down = 1 - HC_up - HC_nc;
 	if (any(HC_down~HC_nc~HC_up .< 0)) println(HC_down~HC_nc~HC_up);
 	if (any(HC_down~HC_nc~HC_up .< 0)) oxrunerror("HC probs. invalid");
      return HC_down~HC_nc~HC_up;
@@ -221,7 +203,7 @@ QualityConstraints_3::Cr_Transit(FeasA){
   	if(!CV(GROWNUp)){
 		decl ivals_work = FeasA[][work.pos], ivals_attend = FeasA[][attend.pos]; 
 	    prob_pass = ivals_attend .? (theta[CrPassInter] + theta[CrPassAbil]*CV(Abil) + theta[CrPassPT]*(ivals_work.==.5) + theta[CrPassFT]*(ivals_work.==1)) .: 0;
-		prob_p = exp(prob_pass)./(1+exp(prob_pass));
+		prob_p = ivals_attend .? (exp(prob_pass)./(1+exp(prob_pass))) .: 0;
 		 }
 	else{
 		prob_p = 0;
@@ -233,8 +215,7 @@ QualityConstraints_3::Cr_Transit(FeasA){
 }
 
 QualityConstraints_3::Loans(FeasA){
-//	decl th = Settheta(ind[tracking]);
-decl th = Settheta(I::all[tracking]);
+	decl th = Settheta(I::all[tracking]);
 	return th->Budget(FeasA);	
 	}
 	
@@ -249,13 +230,17 @@ QualityConstraints_3::Budget(FeasA) {
 	decl att1 = FeasA[][attend.pos], wrk1 = FeasA[][work.pos], sav1 = FeasA[][borrow.pos];
 	decl wage_shock = wagesig*AV(wageoffer);
 	decl tau = CV(Tau);
-	decl omega = CV(Omega), omega_1 = CV(Omega_1), beta = CV(Beta), beta_1 = CV(Beta_1);
+	decl omega_0 = CV(Omega[0]), omega_1 = CV(Omega[1]), beta = CV(Beta[0]), beta_1 = CV(Beta[1]);
+
 	 /*Wages*/
-	wage = (wrk1.==0) .? ((omega[MinEarnInt]) + (omega[MinEarnHC])*CV(HC))*52
-	                  .: (CV(HC)*exp(omega_1[WageInt] + omega_1[WagePT]*(wrk1.==1) + omega_1[WageAtt]*att1 + omega_1[WageHC]*CV(HC) + wage_shock))*hours*weeks.*AV(wrk1)/2; //yearly wages too high right now 
-
-
-
+	if(I::t < TMax-2){
+		wage = (wrk1.==0) .? ((omega_0[MinEarnInt]) + (omega_0[MinEarnHC])*CV(HC))*52
+	                  .: (CV(HC)*exp(omega_1[WageInt] + omega_1[WagePT]*(wrk1.==1) + omega_1[WageAtt]*att1 + omega_1[WageHC]*CV(HC) + wage_shock))*hours*weeks.*AV(wrk1)/2;
+	}
+	else{		  //Updated June (2015) to resolve issue of wages being 0 in stationary phase when working full-time (forced to) and 0 HC. 
+		 wage = max(omega_0[MinEarnInt], CV(HC)*exp(omega_1[WageInt] + omega_1[WageHC]*CV(HC) + wage_shock))*hours*weeks.*AV(wrk1)/2;
+		}
+	
 	/*Parental Transfers*/
 	transfers = (I::t>=TMax-2) ? 0 : beta_1[AmTrnsInt] + beta_1[AmTrnsAtt]*att1 + beta_1[AmTrnsParInc]*CV(Inc);
 	gross = AV(asset) + wage + transfers;
@@ -286,10 +271,9 @@ QualityConstraints_3::Event() {
 	return (I::t >= TMax-2);
 	}
 	
-	QualityConstraints_3::Utility() {
-
-	decl gamma = CV(Gamma);
-	decl gamma_1 = CV(Gamma_1);
+QualityConstraints_3::Utility() {
+	decl gamma = CV(Gamma[0]);
+	decl gamma_1 = CV(Gamma[1]);
 
 	if (I::t==TMax-1 || I::t==0) return zeros(rows(A[Aind]),1);
 
@@ -300,6 +284,6 @@ QualityConstraints_3::Event() {
 
 	/*Total one period utility*/
 	decl util = cons .<= 0.0 .? -.Inf .:  (cons.^(1-rho))/(1-rho) + aa(attend)*gamma[SchUtilType1] + aa(work)*gamma_1[WrkUtilFullTime];
-
+	
 	return util;
 	}

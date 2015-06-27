@@ -11,7 +11,7 @@ struct QualityConstraints_3 : ExPostSmoothing	{	 //ExpostSmoothing just copied f
 	//**Labels for school choices. @name Choices **/
 	  enum{Noschool, ElitePrivate, Private, ElitePublic, Public, MSchooltype}
 
-	  enum{Forgotten}
+	  enum{Forgotten=0}
 
 	//**Labels for GrowUp**//
 	  
