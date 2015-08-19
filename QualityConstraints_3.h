@@ -136,7 +136,10 @@ struct QualityConstraints_3 : ExPostSmoothing	{	 //ExpostSmoothing just copied f
 											ind,
 											Beta,
 											Beta_1,
+											myobj,
+											GMM,
 											xpt;
+											
 
 			decl							gross,
 											transfers,
@@ -145,7 +148,8 @@ struct QualityConstraints_3 : ExPostSmoothing	{	 //ExpostSmoothing just copied f
 											n_loans;
  
 	static 	Replicate();
-	static	Reachable();
+//	static	Reachable();
+			Reachable();
 			Budget(FeasA);
 			Utility();
 	static	HC_trans(FeasA);
@@ -154,7 +158,9 @@ struct QualityConstraints_3 : ExPostSmoothing	{	 //ExpostSmoothing just copied f
 	static  Savings(FeasA);
 	static  Loans(FeasA);
 	static	Event();
-	 	   	FeasibleActions(const Alpha); 
+	 	   	FeasibleActions(const Alpha);
+	static output();		//not sur eif needed here
+	virtual vfunc();	//not sure if needed here
 	}
 
 	struct CollegeData : DataSet {
